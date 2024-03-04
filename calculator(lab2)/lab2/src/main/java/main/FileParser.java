@@ -11,7 +11,7 @@ public class FileParser implements Parser {
     public static final Logger logger = Logger.getLogger(FileParser.class);
 
     @Override
-    public void loadCommands(ArrayList<String> list, BufferedReader reader) throws IOException {
+    public void loadCommands(ArrayList<String> list, BufferedReader reader) {
         String line = "";
         try {
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
@@ -22,6 +22,5 @@ public class FileParser implements Parser {
             logger.error(e.getMessage(), e);
             System.out.println();
         }
-        reader.close();
     }
 }

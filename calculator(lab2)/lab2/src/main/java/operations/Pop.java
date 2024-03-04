@@ -15,13 +15,12 @@ public class Pop implements Product {
 
     @Override
     public int doOperations(Map<String, Double> defines, Stack<Double> stack, String action) {
-        try {
-            stack.pop();
-        } catch (EmptyStackException ex) {
-            logger.error(ex.getMessage(), ex);
-            System.out.println("Error with quantity elements in stack");
+
+        if (stack.isEmpty()) {
+            logger.info("Not enough elements in stack");
             return -1;
-        }
+        } else stack.pop();
+
         return 0;
     }
 }

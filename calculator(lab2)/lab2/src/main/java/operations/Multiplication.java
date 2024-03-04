@@ -17,15 +17,18 @@ public class Multiplication implements Product {
     public int doOperations(Map<String, Double> defines, Stack<Double> stack, String action) {
         double num1;
         double num2;
-        try {
-            num1 = stack.pop();
-            num2 = stack.pop();
-        } catch (EmptyStackException ex) {
-            logger.info(action);
-            logger.error(ex.getMessage(), ex);
-            System.out.println("Error with quantity elements in stack");
+
+        if (stack.isEmpty()) {
+            logger.info("Not enough elements in stack");
             return -1;
-        }
+        } else num1 = stack.pop();
+
+        if (stack.isEmpty()) {
+            logger.info("Not enough elements in stack");
+            stack.push(num1);
+            return -1;
+        } else num2 = stack.pop();
+
         stack.push(num1 * num2);
         return 0;
     }

@@ -5,5 +5,5 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public interface Parser {
-    void loadCommands(ArrayList<String> list, BufferedReader reader) throws IOException;
+    void loadCommands(ArrayList<String> list, BufferedReader reader);
 }

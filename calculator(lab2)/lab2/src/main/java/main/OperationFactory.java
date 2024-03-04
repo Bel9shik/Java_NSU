@@ -1,5 +1,7 @@
 package main;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,8 +49,11 @@ public class OperationFactory {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         String path = packageName.replace('.', '/');
         java.net.URL resource = classLoader.getResource(path);
+//        System.out.println(resource);
+//        System.out.println(resource.getFile());
         java.io.File directory = new java.io.File(resource.getFile());
         java.util.ArrayList<Class> classes = new java.util.ArrayList<Class>();
+//        System.out.println(Arrays.asList(directory.listFiles()));
 
         for (java.io.File file : directory.listFiles()) {
             if (file.getName().endsWith(".class")) {

@@ -16,14 +16,13 @@ public class Print implements Product {
 
     @Override
     public int doOperations(Map<String, Double> defines, Stack<Double> stack, String action) {
-        Double num;
-        try {
-            num = stack.peek();
-        } catch (EmptyStackException ex) {
-            logger.error(ex.getMessage(), ex);
-            System.out.println("Error with quantity elements in stack");
+        double num;
+
+        if (stack.isEmpty()) {
+            logger.info("Not enough elements in stack");
             return -1;
-        }
+        } else num = stack.pop();
+
         System.out.println(num);
         return 0;
     }

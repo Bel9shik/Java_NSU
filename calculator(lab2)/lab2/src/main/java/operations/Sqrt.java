@@ -14,15 +14,14 @@ public class Sqrt implements Product {
 
     @Override
     public int doOperations(Map<String, Double> defines, Stack<Double> stack, String action) {
-        Double value;
-        try {
-            value = stack.pop();
-        } catch (EmptyStackException ex) {
-            logger.error(ex.getMessage(), ex);
-            System.out.println("Error with quantity elements in stack");
+        double num;
+
+        if (stack.isEmpty()) {
+            logger.info("Not enough elements in stack");
             return -1;
-        }
-        stack.push(Math.sqrt(value));
+        } else num = stack.pop();
+
+        stack.push(Math.sqrt(num));
         return 0;
     }
 }
