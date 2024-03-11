@@ -20,7 +20,6 @@ public class FileParser implements Parser {
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-            System.out.println();
         }
     }
 }

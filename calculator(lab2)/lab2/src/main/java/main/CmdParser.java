@@ -18,7 +18,6 @@ public class CmdParser implements Parser {
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-            System.out.println();
         }
     }
 }

@@ -32,6 +32,12 @@ public class ControlBlock {
                 parser = new FileParser();
                 BufferedReader reader = new BufferedReader(new FileReader(args[0]));
                 parser.loadCommands(commands, reader);
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    logger.error(ex.getMessage(), ex);
+                    return;
+                }
             } catch (FileNotFoundException exception) {
                 logger.error(exception.getMessage(), exception);
                 return;
