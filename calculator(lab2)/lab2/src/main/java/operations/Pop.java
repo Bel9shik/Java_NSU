@@ -1,5 +1,6 @@
 package operations;
 
+import main.Context;
 import org.apache.log4j.Logger;
 
 import java.util.EmptyStackException;
@@ -14,13 +15,18 @@ public class Pop implements Product {
     public static final Logger logger = Logger.getLogger(Pop.class);
 
     @Override
-    public int doOperations(Map<String, Double> defines, Stack<Double> stack, String action) {
+    public int doOperations(Context context, String action) {
 
-        if (stack.isEmpty()) {
+        if (context.getStack().isEmpty()) {
             logger.info("Not enough elements in stack");
             return -1;
-        } else stack.pop();
+        } else context.getStack().pop();
 
         return 0;
+    }
+
+    @Override
+    public int doOperations(Context context) {
+        return -1;
     }
 }

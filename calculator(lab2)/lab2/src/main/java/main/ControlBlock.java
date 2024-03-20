@@ -3,28 +3,37 @@ package main;
 import operations.Product;
 import org.apache.log4j.Logger;
 
+import javax.management.OperationsException;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ControlBlock {
 
     public static final Logger logger = Logger.getLogger(ControlBlock.class);
     Parser parser;
-    public void startGame(String[] args) {
+
+    Calculate calculate = new Calculate();
+
+    Context context = new Context();
+    public void start(String[] args) {
 
         ArrayList<String> commands = new ArrayList<>();
 
+        //create factory
         //initialize reader and parser
         if (args.length == 0) {
             logger.info("Work with console");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            parser = new CmdParser();
-            parser.loadCommands(commands, reader);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in)); //итеративное считывание
+//            parser = new CmdParser();
+//            parser.loadCommands(commands, reader);
+            String line = "";
             try {
-                reader.close();
-            } catch (IOException ex) {
-                logger.error(ex.getMessage(), ex);
-                return;
+                while (!(line = reader.readLine()).isEmpty()) {
+                    commands.add(line);
+                }
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
             }
         } else {
             try {
@@ -44,19 +53,10 @@ public class ControlBlock {
             }
         }
 
+        OperationFactory operationFactory = new OperationFactory();
 
-        for (String command : commands) {
-            Product operator;
-            try {
-                operator = Context.opFactory.getOperation(command.split(" ")[0]);
-            } catch (IllegalAccessException | InstantiationException e) {
-                logger.error(e.getMessage(), e);
-                return;
-            }
-            if (operator.doOperations(Context.defines, Context.stack, command) == -1) {
-                break;
-            }
-        }
+        calculate.calculating(commands, context, operationFactory);
+
     }
 }
 

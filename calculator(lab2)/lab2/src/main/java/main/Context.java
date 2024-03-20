@@ -4,10 +4,15 @@ import java.util.HashMap;
 import java.util.Stack;
 
 public class Context {
-    public static HashMap<String, Double> defines = new HashMap<>();
+    private HashMap<String, Double> defines = new HashMap<>();
+    private Stack<Double> stack = new Stack<>();
 
-    public static Stack<Double> stack = new Stack<>();
 
-    public static OperationFactory opFactory = new OperationFactory();
+    public HashMap<String, Double> getDefines() {
+        return defines;
+    }
 
+    public Stack<Double> getStack() {
+        return stack;
+    }
 }

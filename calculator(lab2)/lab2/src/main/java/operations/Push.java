@@ -1,5 +1,6 @@
 package operations;
 
+import main.Context;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -12,12 +13,12 @@ public class Push implements Product {
     public static final Logger logger = Logger.getLogger(Push.class);
 
     @Override
-    public int doOperations(Map<String, Double> defines, Stack<Double> stack, String action) {
+    public int doOperations(Context context, String action) {
         String argument = action.split(" ")[1];
 
-        for (Map.Entry<String, Double> entry : defines.entrySet()) {
+        for (Map.Entry<String, Double> entry : context.getDefines().entrySet()) {
             if (entry.getKey().equals(argument)) {
-                stack.push(entry.getValue());
+                context.getStack().push(entry.getValue());
                 return 0;
             }
         }
@@ -28,14 +29,17 @@ public class Push implements Product {
             value = Double.parseDouble(argument);
         } catch (NumberFormatException ex) {
             logger.error(ex.getMessage(), ex);
-            System.out.println("Invalid arguments in push command");
             return -1;
         }
-        stack.push(value);
+        context.getStack().push(value);
 
         return 0;
     }
 
+    @Override
+    public int doOperations(Context context) {
+        return -1;
+    }
 }
 
 

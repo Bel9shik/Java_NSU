@@ -1,5 +1,6 @@
 package operations;
 
+import main.Context;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -13,7 +14,7 @@ public class Define implements Product {
     public static final Logger logger = Logger.getLogger(Define.class);
 
     @Override
-    public int doOperations(Map<String, Double> defines, Stack<Double> stack, String action) { //check valid arguments
+    public int doOperations(Context context, String action) {
         String argument = action.split(" ")[1];
         Double value;
         try {
@@ -23,8 +24,13 @@ public class Define implements Product {
             System.out.println("Invalid arguments in define command");
             return -1;
         }
-        defines.put(argument, value);
+        context.getDefines().put(argument, value);
 
         return 0;
+    }
+
+    @Override
+    public int doOperations(Context context) {
+        return -1;
     }
 }
