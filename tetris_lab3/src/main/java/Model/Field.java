@@ -2,17 +2,17 @@ package Model;
 
 import java.util.HashMap;
 
-public class Field {
+public final class Field {
 
-    private HashMap<PairCoords, Boolean> field = new HashMap<>(10 * 18);
+    private HashMap<PairCoords, Boolean> field = new HashMap<>(12 * 22); // 10 - horizontal, 20 - vertical
 
     public HashMap<PairCoords, Boolean> getField() {
         return field;
     }
 
-    public void setField(HashMap<PairCoords, Boolean> field) {
-        this.field = field;
-    }
+//    public void setField(HashMap<PairCoords, Boolean> field) {
+//        this.field = field;
+//    }
 
     public boolean setCellAlive(PairCoords coords) {
         if (field.containsKey(coords)) return false;

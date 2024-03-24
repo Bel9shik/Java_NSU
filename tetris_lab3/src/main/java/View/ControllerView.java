@@ -1,6 +1,5 @@
 package View;
 
-import Controller.Figures.JFigure;
 import Model.Field;
 import Model.PairCoords;
 
@@ -54,7 +53,6 @@ public class ControllerView extends JFrame {
 //                mainPanel.add(coords);
             }
         }
-        createApplicationWindow();
     }
 
     public void createApplicationWindow() {
