@@ -1,11 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.example</groupId>
-        <artifactId>Java_NSU</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
+    <groupId>org.example</groupId>
+    <version>1.0-SNAPSHOT</version>
     <artifactId>lab2</artifactId>
     <name>Archetype - lab2</name>
     <url>http://maven.apache.org</url>
@@ -50,5 +47,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 
 </project>

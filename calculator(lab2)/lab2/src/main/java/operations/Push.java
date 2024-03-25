@@ -3,8 +3,9 @@ package operations;
 import main.Context;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 @operation(
         name = "PUSH"
@@ -13,8 +14,9 @@ public class Push implements Product {
     public static final Logger logger = Logger.getLogger(Push.class);
 
     @Override
-    public int doOperations(Context context, String action) {
-        String argument = action.split(" ")[1];
+    public int doOperations(ArrayList<Object> args) {
+        Context context = (Context) args.get(0);
+        String argument = (String) args.get(1);
 
         for (Map.Entry<String, Double> entry : context.getDefines().entrySet()) {
             if (entry.getKey().equals(argument)) {
@@ -22,13 +24,10 @@ public class Push implements Product {
                 return 0;
             }
         }
-
-        argument = action.split(" ")[1];
         Double value;
         try {
             value = Double.parseDouble(argument);
-        } catch (NumberFormatException ex) {
-            logger.error(ex.getMessage(), ex);
+        } catch (NumberFormatException e) {
             return -1;
         }
         context.getStack().push(value);
@@ -37,8 +36,8 @@ public class Push implements Product {
     }
 
     @Override
-    public int doOperations(Context context) {
-        return -1;
+    public boolean checkArguments(List<Object> args) {
+        return !((String) args.get(0)).isEmpty();
     }
 }
 

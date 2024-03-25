@@ -3,10 +3,8 @@ package operations;
 import main.Context;
 import org.apache.log4j.Logger;
 
-import java.util.Collections;
-import java.util.EmptyStackException;
-import java.util.Map;
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
 
 @operation(
         name = "MINUS"
@@ -15,28 +13,23 @@ public class Minus implements Product {
 
     public static final Logger logger = Logger.getLogger(Minus.class);
 
+
     @Override
-    public int doOperations(Context context, String action) {
-        double num1;
-        double num2;
-
-        if (context.getStack().isEmpty()) {
-            logger.info("Not enough elements in stack");
+    public int doOperations(ArrayList<Object> args) {
+        Context context = (Context) args.get(0);
+        if (context.getStack().size() < 2) {
             return -1;
-        } else num1 = context.getStack().pop();
-
-        if (context.getStack().isEmpty()) {
-            logger.info("Not enough elements in stack");
-            context.getStack().push(num1);
-            return -1;
-        } else num2 = context.getStack().pop();
+        }
+        double num1 = context.getStack().pop();
+        double num2 = context.getStack().pop();
 
         context.getStack().push(num1 - num2);
         return 0;
     }
 
     @Override
-    public int doOperations(Context context) {
-        return -1;
+    public boolean checkArguments(List<Object> args) {
+        return ((String)args.get(0)).isEmpty();
     }
+
 }

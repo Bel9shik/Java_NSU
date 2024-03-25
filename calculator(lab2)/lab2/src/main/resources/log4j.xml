@@ -2,6 +2,7 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
 
+<!--    THIS IS TESTING VARIANT -->
     <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="1MB" />
         <param name="maxBackupIndex" value="2 " />
@@ -36,3 +37,48 @@
     <!--    </root>-->
 
 </log4j:configuration>
+
+<!--        <?xml version="1.0" encoding="UTF-8" ?>-->
+<!--        <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">-->
+<!--<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">-->
+
+<!--<appender name="consoleAppender" class="org.apache.log4j.RollingFileAppender">-->
+<!--    &lt;!&ndash;        <param name="maxFileSize" value="1MB" />&ndash;&gt;-->
+<!--    &lt;!&ndash;        <param name="maxBackupIndex" value="2 " />&ndash;&gt;-->
+<!--    <param name="Console" value="SYSTEM_OUT" />-->
+<!--    <layout class="org.apache.log4j.PatternLayout">-->
+<!--        <param name="ConversionPattern" value="%d %-5p [%c{1}] - %m%n" />-->
+<!--    </layout>-->
+<!--</appender>-->
+
+<!--<appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">-->
+<!--    <param name="maxFileSize" value="1MB" />-->
+<!--    <param name="maxBackupIndex" value="2 " />-->
+<!--    <param name="File" value="lab2/src/main/java/logCalculator.txt" />-->
+<!--    <layout class="org.apache.log4j.PatternLayout">-->
+<!--        <param name="ConversionPattern" value="%d %-5p [%c{1}] - %m%n" />-->
+<!--    </layout>-->
+<!--</appender>-->
+
+<!--<appender name="mathAppender" class="org.apache.log4j.RollingFileAppender">-->
+<!--    <param name="maxFileSize" value="1MB" />-->
+<!--    <param name="maxBackupIndex" value="2 " />-->
+<!--    <param name="File" value="lab2/src/main/java/logMathOperations.txt" />-->
+<!--    <layout class="org.apache.log4j.PatternLayout">-->
+<!--        <param name="ConversionPattern" value="%d %-5p [%c{1}] - %m%n" />-->
+<!--        &lt;!&ndash;            add name logger&ndash;&gt;-->
+<!--    </layout>-->
+<!--</appender>-->
+
+<!--&lt;!&ndash;    <appender name="ConsoleAppender">&ndash;&gt;-->
+
+<!--<category name="main">-->
+<!--    <priority value="info" />-->
+<!--    <appender-ref ref="fileAppender"/>-->
+<!--</category>-->
+<!--<category name="operations" additivity="false">-->
+<!--    <priority value="info" />-->
+<!--    <appender-ref ref="mathAppender"/>-->
+<!--</category>-->
+
+<!--</log4j:configuration>-->

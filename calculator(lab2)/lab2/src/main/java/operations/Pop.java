@@ -3,9 +3,7 @@ package operations;
 import main.Context;
 import org.apache.log4j.Logger;
 
-import java.util.EmptyStackException;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 @operation(
         name = "POP"
@@ -15,10 +13,9 @@ public class Pop implements Product {
     public static final Logger logger = Logger.getLogger(Pop.class);
 
     @Override
-    public int doOperations(Context context, String action) {
-
+    public int doOperations(ArrayList<Object> args) {
+        Context context = (Context) args.get(0);
         if (context.getStack().isEmpty()) {
-            logger.info("Not enough elements in stack");
             return -1;
         } else context.getStack().pop();
 
@@ -26,7 +23,7 @@ public class Pop implements Product {
     }
 
     @Override
-    public int doOperations(Context context) {
-        return -1;
+    public boolean checkArguments(List<Object> args) {
+        return ((String)args.get(0)).isEmpty();
     }
 }

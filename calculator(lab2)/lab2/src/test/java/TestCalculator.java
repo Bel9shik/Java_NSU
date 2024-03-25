@@ -1,7 +1,6 @@
 import operations.*;
 import main.*;
 import org.junit.jupiter.api.Test;
-import org.apache.log4j.*;
 
 import java.io.*;
 import java.util.ArrayList;

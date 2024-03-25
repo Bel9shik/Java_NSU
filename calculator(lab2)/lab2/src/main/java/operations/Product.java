@@ -1,11 +1,9 @@
 package operations;
 
-import main.Context;
-
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 public interface Product {
-    int doOperations(Context context, String action); //context
-    int doOperations(Context context); //context
+    int doOperations(ArrayList<Object> args); //in args[0] = context
+
+    boolean checkArguments(List<Object> args);
 }

@@ -3,9 +3,7 @@ package operations;
 import main.Context;
 import org.apache.log4j.Logger;
 
-import java.util.EmptyStackException;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 @operation(
         name = "SQRT"
@@ -14,20 +12,17 @@ public class Sqrt implements Product {
     public static final Logger logger = Logger.getLogger(Sqrt.class);
 
     @Override
-    public int doOperations(Context context, String action) {
-        double num;
-
-        if (context.getStack().isEmpty()) {
-            logger.info("Not enough elements in stack");
-            return -1;
-        } else num = context.getStack().pop();
+    public int doOperations(ArrayList<Object> args) {
+        Context context = (Context) args.get(0);
+        if (context.getStack().isEmpty()) return -1;
+        double num = context.getStack().pop();
 
         context.getStack().push(Math.sqrt(num));
         return 0;
     }
 
     @Override
-    public int doOperations(Context context) {
-        return -1;
+    public boolean checkArguments(List<Object> args) {
+       return ((String)args.get(0)).isEmpty();
     }
 }

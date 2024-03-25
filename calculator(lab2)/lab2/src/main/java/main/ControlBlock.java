@@ -3,62 +3,85 @@ package main;
 import operations.Product;
 import org.apache.log4j.Logger;
 
-import javax.management.OperationsException;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Arrays;
 
 public class ControlBlock {
 
     public static final Logger logger = Logger.getLogger(ControlBlock.class);
-    Parser parser;
-
-    Calculate calculate = new Calculate();
-
     Context context = new Context();
+
     public void start(String[] args) {
 
-        ArrayList<String> commands = new ArrayList<>();
+        OperationFactory operationFactory = new OperationFactory();
 
+        BufferedReader reader;
+
+        boolean flagAboutConsoleInput = false;
         //create factory
         //initialize reader and parser
         if (args.length == 0) {
-            logger.info("Work with console");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in)); //итеративное считывание
-//            parser = new CmdParser();
-//            parser.loadCommands(commands, reader);
-            String line = "";
-            try {
-                while (!(line = reader.readLine()).isEmpty()) {
-                    commands.add(line);
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
+            reader = new BufferedReader(new InputStreamReader(System.in)); //итеративное считывание
+            flagAboutConsoleInput = true;
         } else {
             try {
-                logger.info("Work with file " + args[0]);
-                parser = new FileParser();
-                BufferedReader reader = new BufferedReader(new FileReader(args[0]));
-                parser.loadCommands(commands, reader);
-                try {
-                    reader.close();
-                } catch (IOException ex) {
-                    logger.error(ex.getMessage(), ex);
-                    return;
-                }
-            } catch (FileNotFoundException exception) {
-                logger.error(exception.getMessage(), exception);
+                reader = new BufferedReader(new FileReader(args[0]));
+            } catch (FileNotFoundException e) {
+                logger.error(e.getMessage(), e);
                 return;
             }
         }
 
-        OperationFactory operationFactory = new OperationFactory();
+        String delimiter = " ";
 
-        calculate.calculating(commands, context, operationFactory);
+        String line;
+
+        try {
+
+            //calculating
+            while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                ArrayList<Object> parameters = new ArrayList<>();
+                parameters.add(context);
+                Product operation;
+                try {
+                    if ((operation = operationFactory.getOperation(line.split(delimiter)[0])) == null) {
+                        logger.warn("Command not found");
+                        continue;
+                    }
+                } catch (IllegalArgumentException e) {
+                    logger.warn("Command not found");
+                    continue;
+                }
+                String opArgs = "";
+                if(!line.contains(delimiter)) {
+                    if (!operation.checkArguments(Arrays.asList(opArgs.split(delimiter)))) {
+                        logger.warn("Invalid arguments in operation: " + line.split(delimiter)[0]);
+                        continue;
+                    }
+                } else {
+                    opArgs = line.substring(line.indexOf(delimiter) + 1);
+                    if (!operation.checkArguments(Arrays.asList(opArgs.split(delimiter)))) {
+                        logger.warn("Invalid arguments in operation: " + line.split(delimiter)[0]);
+                        continue;
+                    }
+                }
+                parameters.addAll(Arrays.asList(opArgs.split(delimiter)));
+                if (operation.doOperations(parameters) == -1) {
+                    logger.warn("Error in command: " + line.split(delimiter)[0]);
+                }
+            }
+        } catch (IOException | IllegalAccessException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        if (!flagAboutConsoleInput) {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
 
     }
 }
-
-
-

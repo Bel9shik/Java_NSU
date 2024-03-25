@@ -18,7 +18,7 @@ public class ClassUtils {
     }
 
     private static List<String> findAllClasses(final String element) {
-        final List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<>();
         final File file = new File(element);
         if (file.isDirectory()) {
             result.addAll(findClassesInFolder(file, file));
@@ -29,14 +29,14 @@ public class ClassUtils {
     }
 
     private static List<String> loadClassesFromJarFile(final File file) {
-        final List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<>();
 
         try (ZipFile zf = new ZipFile(file)) {
             final Enumeration e = zf.entries();
             while (e.hasMoreElements()) {
                 final ZipEntry ze = (ZipEntry) e.nextElement();
                 final String fileName = ze.getName();
-                var pos = fileName.toLowerCase().indexOf(".class");
+                int pos = fileName.toLowerCase().indexOf(".class");
                 if (pos > 0) {
                     result.add(fileName.replace('/', '.').substring(0, pos));
                 }
@@ -57,7 +57,7 @@ public class ClassUtils {
                 result.addAll(findClassesInFolder(file, baseDir));
             } else {
                 final String fileName = file.getAbsolutePath().substring(baseDir.getAbsolutePath().length() + 1);
-                var pos = fileName.toLowerCase().indexOf(".class");
+                int pos = fileName.toLowerCase().indexOf(".class");
                 if (pos > 0) {
                     result.add(fileName.replace(File.separator, ".").substring(0, pos));
                 }
