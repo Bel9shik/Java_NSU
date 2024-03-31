@@ -10,10 +10,6 @@ public final class Field {
         return field;
     }
 
-//    public void setField(HashMap<PairCoords, Boolean> field) {
-//        this.field = field;
-//    }
-
     public boolean setCellAlive(PairCoords coords) {
         if (field.containsKey(coords)) return false;
         else {
