@@ -3,6 +3,7 @@ package Model.Figures;
 import Controller.KeyHandler;
 import Model.PairCoords;
 import Model.PlayManager;
+import View.GamePanel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -120,13 +121,6 @@ abstract public class GeneralFigure {
         }
     }
 
-    public final void draw(Graphics2D g2) {
-        g2.setColor(mino.get(0).color);
-        for (Block block : mino) {
-            block.draw(g2);
-        }
-    }
-
     public final void checkMovementCollision() {
         leftCollision = false;
         rightCollision = false;
@@ -136,21 +130,21 @@ abstract public class GeneralFigure {
 
         //check left wall
         for (int i = 0; i < mino.size(); i++) {
-            if (mino.get(i).coords.getX() == PlayManager.left_x) {
+            if (mino.get(i).coords.getX() == GamePanel.left_x) {
                 leftCollision = true;
             }
         }
 
         //check right wall
         for (int i = 0; i < mino.size(); i++) {
-            if (mino.get(i).coords.getX() + Block.SIZE == PlayManager.right_x) {
+            if (mino.get(i).coords.getX() + Block.SIZE == GamePanel.right_x) {
                 rightCollision = true;
             }
         }
 
         //check bottom collision
         for (int i = 0; i < mino.size(); i++) {
-            if (mino.get(i).coords.getY() + Block.SIZE == PlayManager.bottom_y) {
+            if (mino.get(i).coords.getY() + Block.SIZE == GamePanel.bottom_y) {
                 bottomCollision = true;
             }
         }
@@ -167,21 +161,21 @@ abstract public class GeneralFigure {
 
         //check left wall
         for (int i = 0; i < tempBlocks.size(); i++) {
-            if (tempBlocks.get(i).coords.getX() <= PlayManager.left_x) {
+            if (tempBlocks.get(i).coords.getX() < GamePanel.left_x) {
                 leftCollision = true;
             }
         }
 
         //check right wall
         for (int i = 0; i < tempBlocks.size(); i++) {
-            if (tempBlocks.get(i).coords.getX() + Block.SIZE >= PlayManager.right_x) {
+            if (tempBlocks.get(i).coords.getX() + Block.SIZE > GamePanel.right_x) {
                 rightCollision = true;
             }
         }
 
         //check bottom collision
         for (int i = 0; i < tempBlocks.size(); i++) {
-            if (tempBlocks.get(i).coords.getY() + Block.SIZE >= PlayManager.bottom_y) {
+            if (tempBlocks.get(i).coords.getY() + Block.SIZE > GamePanel.bottom_y) {
                 bottomCollision = true;
             }
         }
