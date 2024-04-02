@@ -1,5 +1,7 @@
 package operations;
 
+import Exceptions.InvalidArgumentsException;
+import Exceptions.StackException;
 import main.Context;
 import org.apache.log4j.Logger;
 
@@ -10,11 +12,11 @@ import java.util.Map;
 @operation(
         name = "PUSH"
 )
-public class Push implements Product {
+public class Push implements Product  {
     public static final Logger logger = Logger.getLogger(Push.class);
 
     @Override
-    public int doOperations(ArrayList<Object> args) {
+    public int doOperations(ArrayList<Object> args) throws StackException {
         Context context = (Context) args.get(0);
         String argument = (String) args.get(1);
 
@@ -28,7 +30,7 @@ public class Push implements Product {
         try {
             value = Double.parseDouble(argument);
         } catch (NumberFormatException e) {
-            return -1;
+            throw new StackException("error parse in double in \"PUSH\" command");
         }
         context.getStack().push(value);
 
@@ -36,8 +38,9 @@ public class Push implements Product {
     }
 
     @Override
-    public boolean checkArguments(List<Object> args) {
-        return !((String) args.get(0)).isEmpty();
+    public boolean checkArguments(List<Object> args) throws InvalidArgumentsException {
+        if (((String)args.get(0)).isEmpty()) throw new InvalidArgumentsException("arguments in command \"PUSH\" can not be empty");
+        return true;
     }
 }
 

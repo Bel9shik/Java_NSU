@@ -1,5 +1,7 @@
 package main;
 
+import Exceptions.InvalidArgumentsException;
+import Exceptions.StackException;
 import operations.Product;
 import org.apache.log4j.Logger;
 
@@ -54,22 +56,24 @@ public class ControlBlock {
                     continue;
                 }
                 String opArgs = "";
-                if(!line.contains(delimiter)) {
-                    if (!operation.checkArguments(Arrays.asList(opArgs.split(delimiter)))) {
-                        logger.warn("Invalid arguments in operation: " + line.split(delimiter)[0]);
-                        continue;
+
+                try {
+                    if(!line.contains(delimiter)) {
+                        operation.checkArguments(Arrays.asList(opArgs.split(delimiter)));
                     }
-                } else {
-                    opArgs = line.substring(line.indexOf(delimiter) + 1);
-                    if (!operation.checkArguments(Arrays.asList(opArgs.split(delimiter)))) {
-                        logger.warn("Invalid arguments in operation: " + line.split(delimiter)[0]);
-                        continue;
+
+                    else {
+                        opArgs = line.substring(line.indexOf(delimiter) + 1);
+                        operation.checkArguments(Arrays.asList(opArgs.split(delimiter)));
                     }
+
+                    parameters.addAll(Arrays.asList(opArgs.split(delimiter)));
+                    operation.doOperations(parameters);
+
+                } catch (InvalidArgumentsException | StackException e) {
+                    logger.warn(e.getMessage(), e);
                 }
-                parameters.addAll(Arrays.asList(opArgs.split(delimiter)));
-                if (operation.doOperations(parameters) == -1) {
-                    logger.warn("Error in command: " + line.split(delimiter)[0]);
-                }
+
             }
         } catch (IOException | IllegalAccessException e) {
             logger.error(e.getMessage(), e);
