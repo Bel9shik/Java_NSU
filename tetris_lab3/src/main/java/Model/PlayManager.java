@@ -3,7 +3,6 @@ package Model;
 import Model.Figures.*;
 import View.GamePanel;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class PlayManager {
     public long score = 0;
     public long lines = 0;
 
-    public static Sound music = new Sound();
+//    public static Sound music = new Sound();
     public static Sound soundEffect = new Sound();
     public static int dropInterval = 60; //mino drops in every 60 frames
 
@@ -31,8 +30,8 @@ public class PlayManager {
         nextFigure = factoryFigure.getFigure(figuresNames.get(1));
         nextFigure.setXY(GamePanel.NEXT_FIGURE_X, GamePanel.NEXT_FIGURE_Y);
 
-        music.play(0, true);
-        music.loop();
+//        music.play(0, true);
+//        music.loop();
     }
 
     public void update() {
@@ -57,12 +56,12 @@ public class PlayManager {
     }
 
     private void checkDelete() {
-        int x = left_x;
-        int y = top_y;
+        int x = LEFT_X;
+        int y = TOP_Y;
         int blockCount = 0;
         int linesCount = 0;
 
-        while (x < right_x && y < bottom_y) {
+        while (x < RIGHT_X && y < BOTTOM_Y) {
             //count blocks in line
             for (int i = 0; i < staticBlocks.size(); i++) {
                 if (staticBlocks.get(i).coords.getX() == x && staticBlocks.get(i).coords.getY() == y) {
@@ -71,7 +70,7 @@ public class PlayManager {
             }
             x += Block.SIZE;
 
-            if (x == right_x) {
+            if (x == RIGHT_X) {
 
                 // if line filled blocks
                 if (blockCount == GamePanel.PLAY_WIDTH / Block.SIZE) {
@@ -89,7 +88,7 @@ public class PlayManager {
                         }
                     }
                 }
-                x = left_x;
+                x = LEFT_X;
                 y += Block.SIZE;
                 blockCount = 0;
             }

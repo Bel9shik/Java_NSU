@@ -17,6 +17,9 @@ abstract public class GeneralFigure {
     boolean deactivating;
     int deactivateCounter = 0;
 
+    private int extremeCoordinateLeftX;
+    private int extremeCoordinateRightX;
+
 
     public final void create(Color c, int totalBlocks) {
         for (int i = 0; i < totalBlocks; ++i) {
@@ -31,6 +34,7 @@ abstract public class GeneralFigure {
 
     public void rotate() { //white new coords in tempBlocks
         //rotate
+        tempBlocks = mino;
         int centerX = mino.get(0).coords.getX();
         int centerY = mino.get(0).coords.getY();
         for (int i = 0; i < mino.size(); i++) {
@@ -45,7 +49,27 @@ abstract public class GeneralFigure {
 
         checkRotateCollision();
 
-        if (leftCollision || rightCollision || bottomCollision) return;
+        if (bottomCollision) return;
+
+        if (leftCollision) {
+
+            while ((GamePanel.LEFT_X - extremeCoordinateLeftX) != 0) {
+                extremeCoordinateLeftX += Block.SIZE;
+                for (int i = 0; i < tempBlocks.size(); i++) {
+                    tempBlocks.get(i).coords.setX(tempBlocks.get(i).coords.getX() + Block.SIZE);
+                }
+            }
+        }
+
+        if (rightCollision) {
+
+            while ((GamePanel.RIGHT_X - (extremeCoordinateRightX + Block.SIZE)) != 0) {
+                extremeCoordinateRightX -= Block.SIZE;
+                for (int i = 0; i < tempBlocks.size(); i++) {
+                    tempBlocks.get(i).coords.setX(tempBlocks.get(i).coords.getX() - Block.SIZE);
+                }
+            }
+        }
 
         mino = tempBlocks;
     }
@@ -130,21 +154,21 @@ abstract public class GeneralFigure {
 
         //check left wall
         for (int i = 0; i < mino.size(); i++) {
-            if (mino.get(i).coords.getX() == GamePanel.left_x) {
+            if (mino.get(i).coords.getX() == GamePanel.LEFT_X) {
                 leftCollision = true;
             }
         }
 
         //check right wall
         for (int i = 0; i < mino.size(); i++) {
-            if (mino.get(i).coords.getX() + Block.SIZE == GamePanel.right_x) {
+            if (mino.get(i).coords.getX() + Block.SIZE == GamePanel.RIGHT_X) {
                 rightCollision = true;
             }
         }
 
         //check bottom collision
         for (int i = 0; i < mino.size(); i++) {
-            if (mino.get(i).coords.getY() + Block.SIZE == GamePanel.bottom_y) {
+            if (mino.get(i).coords.getY() + Block.SIZE == GamePanel.BOTTOM_Y) {
                 bottomCollision = true;
             }
         }
@@ -159,27 +183,30 @@ abstract public class GeneralFigure {
 
         rotate();
 
-        //check left wall
         for (int i = 0; i < tempBlocks.size(); i++) {
-            if (tempBlocks.get(i).coords.getX() < GamePanel.left_x) {
+            //check left wall
+            if (tempBlocks.get(i).coords.getX() < GamePanel.LEFT_X) {
+                extremeCoordinateLeftX = GamePanel.LEFT_X;
                 leftCollision = true;
+                if (extremeCoordinateLeftX > tempBlocks.get(i).coords.getX()) {
+                    extremeCoordinateLeftX = tempBlocks.get(i).coords.getX();
+                }
             }
-        }
 
-        //check right wall
-        for (int i = 0; i < tempBlocks.size(); i++) {
-            if (tempBlocks.get(i).coords.getX() + Block.SIZE > GamePanel.right_x) {
+            //check right wall
+            if (tempBlocks.get(i).coords.getX() + Block.SIZE > GamePanel.RIGHT_X) {
+                extremeCoordinateRightX = GamePanel.RIGHT_X;
                 rightCollision = true;
+                if (extremeCoordinateRightX < tempBlocks.get(i).coords.getX()) {
+                    extremeCoordinateRightX = tempBlocks.get(i).coords.getX();
+                }
             }
-        }
 
-        //check bottom collision
-        for (int i = 0; i < tempBlocks.size(); i++) {
-            if (tempBlocks.get(i).coords.getY() + Block.SIZE > GamePanel.bottom_y) {
+            //check bottom collision
+            if (tempBlocks.get(i).coords.getY() + Block.SIZE > GamePanel.BOTTOM_Y) {
                 bottomCollision = true;
             }
         }
-
     }
 
     public final void checkContactStaticBlockCollision() {

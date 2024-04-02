@@ -14,14 +14,14 @@ public class GamePanel extends JPanel implements Runnable {
     public static final int WINDOW_HEIGHT = 720;
     public static final int PLAY_WIDTH = 300; // need: PLAY_WIDTH % Block.SIZE = 0
     public final static int PLAY_HEIGHT = 600;
-    public static int left_x = (WINDOW_WIDTH / 2) - (PLAY_WIDTH / 2); // 1280/2 - 300/2
-    public static int right_x = left_x + PLAY_WIDTH;
-    public static int top_y = 50;
-    public static int bottom_y = top_y + PLAY_HEIGHT;;
-    public static final int FIGURE_START_X = left_x + (PLAY_WIDTH / 2) - Block.SIZE;
-    public static final int FIGURE_START_Y = top_y + Block.SIZE;
-    public static final int NEXT_FIGURE_X = right_x + 175;
-    public static final int NEXT_FIGURE_Y = top_y + 500;
+    public final static int LEFT_X = (WINDOW_WIDTH / 2) - (PLAY_WIDTH / 2); // 1280/2 - 300/2
+    public final static int RIGHT_X = LEFT_X + PLAY_WIDTH;
+    public final static int TOP_Y = 50;
+    public final static int BOTTOM_Y = TOP_Y + PLAY_HEIGHT;;
+    public static final int FIGURE_START_X = LEFT_X + (PLAY_WIDTH / 2) - Block.SIZE;
+    public static final int FIGURE_START_Y = TOP_Y + Block.SIZE;
+    public static final int NEXT_FIGURE_X = RIGHT_X + 175;
+    public static final int NEXT_FIGURE_Y = TOP_Y + 500;
     Thread gameThread;
 
     private final int FPS = 60;
@@ -44,7 +44,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     @Override
-    public void run() { //game loop
+    public void run() { //game loop in controller
         System.out.println("run");
         double drawInterval = 1000000000.0 / FPS;
         double delta = 0;
@@ -88,31 +88,24 @@ public class GamePanel extends JPanel implements Runnable {
         //game field
         g2.setColor(Color.white);
         g2.setStroke(new BasicStroke(4f));
-        g2.drawRect(left_x - 4, top_y - 4, PLAY_WIDTH + 8, PLAY_HEIGHT + 8);
+        g2.drawRect(LEFT_X - 4, TOP_Y - 4, PLAY_WIDTH + 8, PLAY_HEIGHT + 8);
 
         //the next figure
-        int x = right_x + 100;
-        int y = bottom_y - 200;
+        int x = RIGHT_X + 100;
+        int y = BOTTOM_Y - 200;
         g2.drawRect(x, y, 200, 200);
         g2.setFont(new Font("Arial", Font.PLAIN, 30));
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2.drawString("NEXT", x + 60, y + 60);
 
         //score
-        g2.drawRect(x, top_y, 250, 300);
+        g2.drawRect(x, TOP_Y, 250, 300);
         x += 40;
-        y = top_y + 90;
+        y = TOP_Y + 90;
         g2.drawString("LINES: " + playManager.lines, x, y);
         y += 70;
         g2.drawString("SCORE: " + playManager.score, x, y);
 
-
-
-        if (playManager.gameOver) {
-            x = left_x + 25;
-            y = top_y + 325;
-            g2.drawString("GAME OVER", x, y );
-        }
 
         if (playManager.currentFigure != null) {
             GamePanel.draw(g2, playManager.currentFigure);
@@ -126,6 +119,15 @@ public class GamePanel extends JPanel implements Runnable {
             PlayManager.staticBlocks.get(i).draw(g2);
         }
 
+        if (playManager.gameOver) {
+            x = LEFT_X + 25;
+            y = TOP_Y + 325;
+            g2.setColor(Color.BLACK);
+            g2.fillRect(x, y - 25, 250, 75);
+            g2.setColor(Color.white);
+            g2.drawString("GAME OVER", x + 10, y + 25 );
+            gameThread = null;
+        }
 
     }
 }
