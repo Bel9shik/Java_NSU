@@ -153,23 +153,26 @@ abstract public class GeneralFigure {
         checkContactStaticBlockCollision();
 
         //check left wall
-        for (int i = 0; i < mino.size(); i++) {
-            if (mino.get(i).coords.getX() == GamePanel.LEFT_X) {
+        for (Block block : mino) {
+            if (block.coords.getX() == GamePanel.LEFT_X) {
                 leftCollision = true;
+                break;
             }
         }
 
         //check right wall
-        for (int i = 0; i < mino.size(); i++) {
-            if (mino.get(i).coords.getX() + Block.SIZE == GamePanel.RIGHT_X) {
+        for (Block block : mino) {
+            if (block.coords.getX() + Block.SIZE == GamePanel.RIGHT_X) {
                 rightCollision = true;
+                break;
             }
         }
 
         //check bottom collision
-        for (int i = 0; i < mino.size(); i++) {
-            if (mino.get(i).coords.getY() + Block.SIZE == GamePanel.BOTTOM_Y) {
+        for (Block block : mino) {
+            if (block.coords.getY() + Block.SIZE == GamePanel.BOTTOM_Y) {
                 bottomCollision = true;
+                break;
             }
         }
     }
@@ -183,27 +186,27 @@ abstract public class GeneralFigure {
 
         rotate();
 
-        for (int i = 0; i < tempBlocks.size(); i++) {
+        for (Block tempBlock : tempBlocks) {
             //check left wall
-            if (tempBlocks.get(i).coords.getX() < GamePanel.LEFT_X) {
+            if (tempBlock.coords.getX() < GamePanel.LEFT_X) {
                 extremeCoordinateLeftX = GamePanel.LEFT_X;
                 leftCollision = true;
-                if (extremeCoordinateLeftX > tempBlocks.get(i).coords.getX()) {
-                    extremeCoordinateLeftX = tempBlocks.get(i).coords.getX();
+                if (extremeCoordinateLeftX > tempBlock.coords.getX()) {
+                    extremeCoordinateLeftX = tempBlock.coords.getX();
                 }
             }
 
             //check right wall
-            if (tempBlocks.get(i).coords.getX() + Block.SIZE > GamePanel.RIGHT_X) {
+            if (tempBlock.coords.getX() + Block.SIZE > GamePanel.RIGHT_X) {
                 extremeCoordinateRightX = GamePanel.RIGHT_X;
                 rightCollision = true;
-                if (extremeCoordinateRightX < tempBlocks.get(i).coords.getX()) {
-                    extremeCoordinateRightX = tempBlocks.get(i).coords.getX();
+                if (extremeCoordinateRightX < tempBlock.coords.getX()) {
+                    extremeCoordinateRightX = tempBlock.coords.getX();
                 }
             }
 
             //check bottom collision
-            if (tempBlocks.get(i).coords.getY() + Block.SIZE > GamePanel.BOTTOM_Y) {
+            if (tempBlock.coords.getY() + Block.SIZE > GamePanel.BOTTOM_Y) {
                 bottomCollision = true;
             }
         }
@@ -215,24 +218,24 @@ abstract public class GeneralFigure {
             int targetY = PlayManager.staticBlocks.get(i).coords.getY();
 
             //bottom collision
-            for (int j = 0; j < mino.size(); j++) {
-                if (mino.get(j).coords.getY() + Block.SIZE == targetY && mino.get(j).coords.getX() == targetX) {
+            for (Block block : mino) {
+                if (block.coords.getY() + Block.SIZE == targetY && block.coords.getX() == targetX) {
                     bottomCollision = true;
                     break;
                 }
             }
 
             //right collision
-            for (int j = 0; j < mino.size(); j++) {
-                if (mino.get(j).coords.getY() == targetY && mino.get(j).coords.getX() + Block.SIZE == targetX) {
+            for (Block block : mino) {
+                if (block.coords.getY() == targetY && block.coords.getX() + Block.SIZE == targetX) {
                     rightCollision = true;
                     break;
                 }
             }
 
             //left collision
-            for (int j = 0; j < mino.size(); j++) {
-                if (mino.get(j).coords.getY() == targetY && mino.get(j).coords.getX() - Block.SIZE == targetX) {
+            for (Block block : mino) {
+                if (block.coords.getY() == targetY && block.coords.getX() - Block.SIZE == targetX) {
                     leftCollision = true;
                     break;
                 }
