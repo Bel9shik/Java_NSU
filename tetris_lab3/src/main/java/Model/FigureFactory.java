@@ -26,7 +26,6 @@ public class FigureFactory {
     private void getAllFigures() {
         for (String rawClass : rawClasses) {
             try {
-                if (rawClass.contains("org") || rawClass.contains("java")) continue;
                 Class<?> clazz = Class.forName(rawClass);
                 if (clazz.isAnnotationPresent(FigureAnnotation.class)) {
                     FigureAnnotation annotation = clazz.getAnnotation(FigureAnnotation.class);
@@ -54,5 +53,9 @@ public class FigureFactory {
         } else {
             throw new IllegalArgumentException("Unknown figure: " + className);
         }
+    }
+
+    public void shuffleBack() {
+        Collections.shuffle(backOfFigures);
     }
 }

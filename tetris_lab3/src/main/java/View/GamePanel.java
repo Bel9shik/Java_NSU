@@ -8,7 +8,7 @@ import Model.PlayManager;
 import javax.swing.*;
 import java.awt.*;
 
-public class GamePanel extends JPanel implements Runnable {
+public class GamePanel extends JPanel {
 
     public static final int WINDOW_WIDTH = 1280;
     public static final int WINDOW_HEIGHT = 720;
@@ -22,12 +22,11 @@ public class GamePanel extends JPanel implements Runnable {
     public static final int FIGURE_START_Y = TOP_Y + Block.SIZE;
     public static final int NEXT_FIGURE_X = RIGHT_X + 175;
     public static final int NEXT_FIGURE_Y = TOP_Y + 500;
-    Thread gameThread;
-
-    private final int FPS = 60;
 
     PlayManager playManager;
-    public GamePanel() {
+
+    public GamePanel(PlayManager playManager) {
+
         this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         this.setBackground(Color.BLACK);
         this.setLayout(null);
@@ -35,39 +34,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.addKeyListener(new KeyHandler());
         this.setFocusable(true);
 
-        playManager = new PlayManager();
-    }
-
-    public void launchGame() {
-        gameThread = new Thread(this);
-        gameThread.start();
-    }
-
-    @Override
-    public void run() { //game loop in controller
-        System.out.println("run");
-        double drawInterval = 1000000000.0 / FPS;
-        double delta = 0;
-        long lastTime = System.nanoTime();
-        long currentTime;
-
-        while (gameThread != null) {
-            currentTime = System.nanoTime();
-            delta += (currentTime - lastTime) / drawInterval;
-            lastTime = currentTime;
-
-            if (delta >= 1) {
-                update();
-                repaint();
-                delta--;
-            }
-        }
-    }
-
-    private void update() {
-        if (!playManager.gameOver) {
-            playManager.update();
-        }
+        this.playManager = playManager;
     }
 
     @Override
@@ -77,10 +44,21 @@ public class GamePanel extends JPanel implements Runnable {
         drawPlayArea((Graphics2D) g);
     }
 
-    public static void draw(Graphics2D g2, GeneralFigure figure) {
+    private static void drawBlock(Graphics2D g2, Block block) {
+        g2.setColor(block.color);
+        g2.fillRect(block.coords.getX() + block.margin, block.coords.getY() + block.margin, Block.SIZE - (block.margin * 2), Block.SIZE - (block.margin * 2));
+    }
+
+    public static void drawFigure (Graphics2D g2, GeneralFigure figure) {
         g2.setColor(figure.mino.get(0).color);
         for (Block block : figure.mino) {
-            block.draw(g2);
+            drawBlock(g2, block);
+        }
+    }
+
+    private void drawStaticBlocks (Graphics2D g2) {
+        for (Block block : PlayManager.staticBlocks) {
+            drawBlock(g2, block);
         }
     }
 
@@ -108,16 +86,14 @@ public class GamePanel extends JPanel implements Runnable {
 
 
         if (playManager.currentFigure != null) {
-            GamePanel.draw(g2, playManager.currentFigure);
+            GamePanel.drawFigure(g2, playManager.currentFigure);
         }
 
         if (playManager.nextFigure != null) {
-            GamePanel.draw(g2, playManager.nextFigure);
+            GamePanel.drawFigure(g2, playManager.nextFigure);
         }
 
-        for (int i = 0; i < PlayManager.staticBlocks.size(); i++) {
-            PlayManager.staticBlocks.get(i).draw(g2);
-        }
+        drawStaticBlocks(g2);
 
         if (playManager.gameOver) {
             x = LEFT_X + 25;
@@ -126,7 +102,6 @@ public class GamePanel extends JPanel implements Runnable {
             g2.fillRect(x, y - 25, 250, 75);
             g2.setColor(Color.white);
             g2.drawString("GAME OVER", x + 10, y + 25 );
-            gameThread = null;
         }
 
     }

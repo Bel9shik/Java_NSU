@@ -14,9 +14,10 @@ public class PlayManager {
     public boolean gameOver = false;
     public long score = 0;
     public long lines = 0;
+    private int countElements;
 
-//    public static Sound music = new Sound();
-    public static Sound soundEffect = new Sound();
+    public static Sound music = new Sound();
+//    public static Sound soundEffect = new Sound();
     public static int dropInterval = 60; //mino drops in every 60 frames
 
     private final FigureFactory factoryFigure = new FigureFactory();
@@ -28,13 +29,14 @@ public class PlayManager {
         currentFigure = factoryFigure.getFigure(figuresNames.get(0));
         currentFigure.setXY(GamePanel.FIGURE_START_X, GamePanel.FIGURE_START_Y);
         nextFigure = factoryFigure.getFigure(figuresNames.get(1));
+        countElements = 2;
         nextFigure.setXY(GamePanel.NEXT_FIGURE_X, GamePanel.NEXT_FIGURE_Y);
 
-//        music.play(0, true);
+        music.startPlay(0, true);
 //        music.loop();
     }
 
-    public void update() {
+    public void update() { //update figures
         //if current figure is active
         if (currentFigure.isActive) {
             currentFigure.update();
@@ -47,7 +49,14 @@ public class PlayManager {
 
             currentFigure = nextFigure;
             currentFigure.setXY(FIGURE_START_X, FIGURE_START_Y);
-            nextFigure = factoryFigure.getFigure(figuresNames.get((int)(Math.random() * 100) % figuresNames.size()));
+
+            if (countElements == figuresNames.size()) {
+                factoryFigure.shuffleBack();
+                countElements = 0;
+            }
+
+            nextFigure = factoryFigure.getFigure(figuresNames.get(countElements));
+            countElements++;
             nextFigure.setXY(NEXT_FIGURE_X, NEXT_FIGURE_Y);
             
             //when a mino becomes inactive, check lines
@@ -55,7 +64,7 @@ public class PlayManager {
         }
     }
 
-    private void checkDelete() {
+    private void checkDelete() { //check to delete the line, if it filled
         int x = LEFT_X;
         int y = TOP_Y;
         int blockCount = 0;

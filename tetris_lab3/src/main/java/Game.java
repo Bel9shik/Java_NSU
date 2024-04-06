@@ -1,12 +1,11 @@
-import View.CreateFrame;
+import Controller.MainLogic;
 
 import java.io.IOException;
 
 public class Game {
 
-    public static void main(String[] args) throws IOException {
-        System.out.println("TETRIS IS COMING");
-
-        CreateFrame createFrame = new CreateFrame("tetris", "");
+    public static void main(String[] args) {
+        MainLogic game = new MainLogic("tetris");
+        game.launchGame();
     }
 }

@@ -1,10 +1,6 @@
 package Model.Figures;
 
-import Model.PairCoords;
-
 import java.awt.*;
-
-import static java.lang.Math.*;
 
 @FigureAnnotation(name = "I")
 public final class IFigure extends GeneralFigure {
