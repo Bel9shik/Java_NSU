@@ -44,12 +44,12 @@ public class GamePanel extends JPanel {
         drawPlayArea((Graphics2D) g);
     }
 
-    private static void drawBlock(Graphics2D g2, Block block) {
+    private void drawBlock(Graphics2D g2, Block block) {
         g2.setColor(block.color);
         g2.fillRect(block.coords.getX() + block.margin, block.coords.getY() + block.margin, Block.SIZE - (block.margin * 2), Block.SIZE - (block.margin * 2));
     }
 
-    public static void drawFigure (Graphics2D g2, GeneralFigure figure) {
+    private void drawFigure (Graphics2D g2, GeneralFigure figure) {
         g2.setColor(figure.mino.get(0).color);
         for (Block block : figure.mino) {
             drawBlock(g2, block);
@@ -86,11 +86,11 @@ public class GamePanel extends JPanel {
 
 
         if (playManager.currentFigure != null) {
-            GamePanel.drawFigure(g2, playManager.currentFigure);
+            drawFigure(g2, playManager.currentFigure);
         }
 
         if (playManager.nextFigure != null) {
-            GamePanel.drawFigure(g2, playManager.nextFigure);
+            drawFigure(g2, playManager.nextFigure);
         }
 
         drawStaticBlocks(g2);
