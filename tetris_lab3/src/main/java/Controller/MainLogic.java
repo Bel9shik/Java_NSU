@@ -1,22 +1,23 @@
 package Controller;
 
-import Model.PlayManager;
+import Model.ModelController;
 import View.CreateFrame;
 import View.GamePanel;
 
-public class MainLogic implements Runnable {
+public final class MainLogic implements Runnable {
 
     private final int FPS = 60;
 
     Thread gameThread;
-    PlayManager playManager;
+    ModelController model;
     GamePanel gamePanel;
     CreateFrame mainFrame;
-
+    FigureController figureController;
 
     public MainLogic(String windowTitle) {
-        playManager = new PlayManager();
-        gamePanel = new GamePanel(playManager);
+        model = new ModelController();
+        figureController = new FigureController(model);
+        gamePanel = new GamePanel(model);
         mainFrame = new CreateFrame(windowTitle, gamePanel);
     }
 
@@ -48,8 +49,8 @@ public class MainLogic implements Runnable {
     }
 
     private void update() {
-        if (!playManager.gameOver) {
-            playManager.update();
+        if (!model.gameOver) {
+            figureController.update();
         }
     }
 }

@@ -1,12 +1,12 @@
 package View;
 
 import Controller.KeyHandler;
-import Model.Figures.Block;
-import Model.Figures.GeneralFigure;
-import Model.PlayManager;
+import Model.Block;
+import Model.ModelController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class GamePanel extends JPanel {
 
@@ -18,14 +18,14 @@ public class GamePanel extends JPanel {
     public final static int RIGHT_X = LEFT_X + PLAY_WIDTH;
     public final static int TOP_Y = 50;
     public final static int BOTTOM_Y = TOP_Y + PLAY_HEIGHT;;
-    public static final int FIGURE_START_X = LEFT_X + (PLAY_WIDTH / 2) - Block.SIZE;
-    public static final int FIGURE_START_Y = TOP_Y + Block.SIZE;
+    public static final int FIGURE_START_X = LEFT_X + (PLAY_WIDTH / 2) - Block.WIDTH;
+    public static final int FIGURE_START_Y = TOP_Y + Block.HEIGHT;
     public static final int NEXT_FIGURE_X = RIGHT_X + 175;
     public static final int NEXT_FIGURE_Y = TOP_Y + 500;
 
-    PlayManager playManager;
+    ModelController model;
 
-    public GamePanel(PlayManager playManager) {
+    public GamePanel(ModelController model) {
 
         this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -33,8 +33,7 @@ public class GamePanel extends JPanel {
 
         this.addKeyListener(new KeyHandler());
         this.setFocusable(true);
-
-        this.playManager = playManager;
+        this.model = model;
     }
 
     @Override
@@ -46,18 +45,19 @@ public class GamePanel extends JPanel {
 
     private void drawBlock(Graphics2D g2, Block block) {
         g2.setColor(block.color);
-        g2.fillRect(block.coords.getX() + block.margin, block.coords.getY() + block.margin, Block.SIZE - (block.margin * 2), Block.SIZE - (block.margin * 2));
+        g2.fillRect(block.coords.getX() + block.margin, block.coords.getY() + block.margin, Block.WIDTH - (block.margin * 2), Block.HEIGHT - (block.margin * 2));
     }
 
-    private void drawFigure (Graphics2D g2, GeneralFigure figure) {
-        g2.setColor(figure.mino.get(0).color);
-        for (Block block : figure.mino) {
+    private void drawFigure (Graphics2D g2, ArrayList<Block> figure) { //мб сделать просто лист?
+        for (Block block : figure) {
+            g2.setColor(block.color);
             drawBlock(g2, block);
         }
     }
 
+
     private void drawStaticBlocks (Graphics2D g2) {
-        for (Block block : PlayManager.staticBlocks) {
+        for (Block block : model.staticBlocks) {
             drawBlock(g2, block);
         }
     }
@@ -80,22 +80,22 @@ public class GamePanel extends JPanel {
         g2.drawRect(x, TOP_Y, 250, 300);
         x += 40;
         y = TOP_Y + 90;
-        g2.drawString("LINES: " + playManager.lines, x, y);
+        g2.drawString("LINES: " + model.lines, x, y);
         y += 70;
-        g2.drawString("SCORE: " + playManager.score, x, y);
+        g2.drawString("SCORE: " + model.score, x, y);
 
 
-        if (playManager.currentFigure != null) {
-            drawFigure(g2, playManager.currentFigure);
+        if (model.currentFigure != null) {
+            drawFigure(g2, (ArrayList<Block>) model.currentFigure);
         }
 
-        if (playManager.nextFigure != null) {
-            drawFigure(g2, playManager.nextFigure);
+        if (model.nextFigure != null) {
+            drawFigure(g2, (ArrayList<Block>) model.nextFigure);
         }
 
         drawStaticBlocks(g2);
 
-        if (playManager.gameOver) {
+        if (model.gameOver) {
             x = LEFT_X + 25;
             y = TOP_Y + 325;
             g2.setColor(Color.BLACK);
