@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class Block extends Rectangle {
     public PairCoords coords;
-    public static final int SIZE = 30; //block size: 30x30 pixels
+    public static final int SIZE = 30; //block size: 30x30 pixels view
     public Color color;
     public final int margin = 2;
     public Block(Color c) {

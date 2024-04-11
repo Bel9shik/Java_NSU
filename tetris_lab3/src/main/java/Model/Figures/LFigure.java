@@ -15,7 +15,7 @@ public final class LFigure extends GeneralFigure {
         //     3
         // 1 0 2
 
-        mino.get(0).coords.setX(x);
+        mino.get(0).coords.setX(x); //factory
         mino.get(0).coords.setY(y);
         mino.get(1).coords.setX(mino.get(0).coords.getX() - Block.SIZE);
         mino.get(1).coords.setY(mino.get(0).coords.getY());

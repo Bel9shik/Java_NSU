@@ -24,4 +24,5 @@ public final class TFigure extends GeneralFigure {
         mino.get(3).coords.setX(mino.get(0).coords.getX());
         mino.get(3).coords.setY(mino.get(0).coords.getY() - Block.SIZE);
     }
+
 }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 abstract public class GeneralFigure {
     public ArrayList<Block> mino = new ArrayList<>();
-    public ArrayList<Block> tempBlocks = new ArrayList<>(); // for check collision
+    public ArrayList<Block> tempBlocks = new ArrayList<>(); // for check collision controller
     int autoDropCounter = 0;
     boolean leftCollision, rightCollision, bottomCollision;
     public boolean isActive = true;
@@ -32,7 +32,7 @@ abstract public class GeneralFigure {
 
     abstract public void setXY(int x, int y);
 
-    public void rotate() { //white new coords in tempBlocks
+    public void rotate() { //white new coords in tempBlocks controller
         //rotate
         tempBlocks = mino;
         int centerX = mino.get(0).coords.getX();

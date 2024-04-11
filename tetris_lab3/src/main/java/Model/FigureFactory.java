@@ -16,6 +16,7 @@ public class FigureFactory {
             backOfFigures.add(figureEntry.getKey());
         }
         Collections.shuffle(backOfFigures);
+        System.out.println(backOfFigures);
     }
 
     public List<String>getBackOfFigure () {
