@@ -1,7 +1,6 @@
 package operations;
 
-import Exceptions.InvalidArgumentsException;
-import Exceptions.StackException;
+import Exceptions.*;
 import main.Context;
 import org.apache.log4j.Logger;
 
@@ -30,7 +29,7 @@ public class Push implements Product  {
         try {
             value = Double.parseDouble(argument);
         } catch (NumberFormatException e) {
-            throw new StackException("error parse in double in \"PUSH\" command");
+            throw new StackParsingException(argument + " in command \"PUSH\"");
         }
         context.getStack().push(value);
 
@@ -38,8 +37,8 @@ public class Push implements Product  {
     }
 
     @Override
-    public boolean checkArguments(List<Object> args) throws InvalidArgumentsException {
-        if (((String)args.get(0)).isEmpty()) throw new InvalidArgumentsException("arguments in command \"PUSH\" can not be empty");
+    public boolean checkArguments(List<Object> args) throws InvalidCheckException {
+        if (((String)args.get(0)).isEmpty()) throw new CheckNotEnoughElementsException("there should be no arguments in the \"PUSH\" command");
         return true;
     }
 }

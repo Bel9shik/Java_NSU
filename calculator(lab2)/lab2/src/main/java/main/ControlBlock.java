@@ -1,6 +1,6 @@
 package main;
 
-import Exceptions.InvalidArgumentsException;
+import Exceptions.InvalidCheckException;
 import Exceptions.StackException;
 import operations.Product;
 import org.apache.log4j.Logger;
@@ -70,7 +70,7 @@ public class ControlBlock {
                     parameters.addAll(Arrays.asList(opArgs.split(delimiter)));
                     operation.doOperations(parameters);
 
-                } catch (InvalidArgumentsException | StackException e) {
+                } catch (InvalidCheckException | StackException e) {
                     logger.warn(e.getMessage(), e);
                 }
 

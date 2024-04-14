@@ -1,7 +1,8 @@
 package operations;
 
-import Exceptions.InvalidArgumentsException;
-import Exceptions.StackException;
+import Exceptions.CheckNotEnoughElementsException;
+import Exceptions.InvalidArgument;
+import Exceptions.InvalidCheckException;
 import main.Context;
 import org.apache.log4j.Logger;
 
@@ -26,15 +27,15 @@ public class Define implements Product {
     }
 
     @Override
-    public boolean checkArguments(List<Object> args) throws InvalidArgumentsException {
-        if (args.size() != 2) throw new InvalidArgumentsException("not enough arguments in \"DEFINE\"");
+    public boolean checkArguments(List<Object> args) throws InvalidCheckException {
+        if (args.size() != 2) throw new CheckNotEnoughElementsException("DEFINE requires two arguments");
         String letter = (String) args.get(0);
         String digit = (String) args.get(1);
-        if (!letter.matches("[a-zA-Z]+")) throw new InvalidArgumentsException("first argument is not correct in \"DEFINE\"");
+        if (!letter.matches("[a-zA-Z]+")) throw new InvalidArgument(letter);
         try {
             Double.parseDouble(digit);
         } catch (NumberFormatException e) {
-            throw new InvalidArgumentsException("second argument in \"DEFINE\" is not correct");
+            throw new InvalidArgument(digit);
         }
         return true;
     }

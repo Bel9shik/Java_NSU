@@ -1,7 +1,9 @@
 package operations;
 
-import Exceptions.InvalidArgumentsException;
+import Exceptions.CheckNotEnoughElementsException;
+import Exceptions.InvalidCheckException;
 import Exceptions.StackException;
+import Exceptions.StackNotEnoughElements;
 import main.Context;
 import org.apache.log4j.Logger;
 
@@ -17,7 +19,7 @@ public class Sqrt implements Product {
     public int doOperations(ArrayList<Object> args) throws StackException {
         Context context = (Context) args.get(0);
 
-        if (context.getStack().isEmpty()) throw new StackException("in \"SQRT\" command not enough elements on stack");
+        if (context.getStack().isEmpty()) throw new StackNotEnoughElements("SQRT");
 
         double num = context.getStack().pop();
 
@@ -26,8 +28,8 @@ public class Sqrt implements Product {
     }
 
     @Override
-    public boolean checkArguments(List<Object> args) throws InvalidArgumentsException {
-        if (!((String)args.get(0)).isEmpty()) throw new InvalidArgumentsException("arguments in command \"SQRT\" can be empty");
+    public boolean checkArguments(List<Object> args) throws InvalidCheckException {
+        if (!((String)args.get(0)).isEmpty()) throw new CheckNotEnoughElementsException("there should be no arguments in the \"SQRT\" command");
         return true;
     }
 }

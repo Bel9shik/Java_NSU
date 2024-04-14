@@ -1,7 +1,8 @@
 package operations;
 
 
-import Exceptions.InvalidArgumentsException;
+import Exceptions.CheckNotEnoughElementsException;
+import Exceptions.InvalidCheckException;
 import Exceptions.StackException;
 import main.Context;
 import org.apache.log4j.Logger;
@@ -16,11 +17,14 @@ public class Print implements Product {
     public static final Logger logger = Logger.getLogger(Print.class);
 
     @Override
-    public int doOperations(ArrayList<Object> args) throws StackException {
+    public int doOperations(ArrayList<Object> args) {
         Context context = (Context) args.get(0);
         double num;
 
-        if (context.getStack().isEmpty()) throw new StackException("in \"PRINT\" command not enough elements on stack");
+        if (context.getStack().isEmpty()) {
+            System.out.println("stack is empty");
+            return 0;
+        }
 
         num = context.getStack().pop();
 
@@ -31,8 +35,8 @@ public class Print implements Product {
     }
 
     @Override
-    public boolean checkArguments(List<Object> args) throws InvalidArgumentsException {
-        if (!((String)args.get(0)).isEmpty()) throw new InvalidArgumentsException("arguments in command \"PRINT\" can be empty");
+    public boolean checkArguments(List<Object> args) throws InvalidCheckException {
+        if (!((String)args.get(0)).isEmpty()) throw new CheckNotEnoughElementsException("there should be no arguments in the \"PRINT\" command");
         return true;
     }
 }

@@ -1,7 +1,9 @@
 package operations;
 
-import Exceptions.InvalidArgumentsException;
+import Exceptions.CheckNotEnoughElementsException;
+import Exceptions.InvalidCheckException;
 import Exceptions.StackException;
+import Exceptions.StackNotEnoughElements;
 import main.Context;
 import org.apache.log4j.Logger;
 
@@ -20,7 +22,7 @@ public class Minus implements Product {
     public int doOperations(ArrayList<Object> args) throws StackException {
         Context context = (Context) args.get(0);
         if (context.getStack().size() < 2) {
-            if (context.getStack().size() < 2) throw new StackException("in \"MINUS\" command not enough elements on stack");
+            throw new StackNotEnoughElements("MINUS");
         }
         double num1 = context.getStack().pop();
         double num2 = context.getStack().pop();
@@ -30,8 +32,8 @@ public class Minus implements Product {
     }
 
     @Override
-    public boolean checkArguments(List<Object> args) throws InvalidArgumentsException {
-        if (!((String)args.get(0)).isEmpty()) throw new InvalidArgumentsException("arguments in command \"MINUS\" can be empty");
+    public boolean checkArguments(List<Object> args) throws InvalidCheckException {
+        if (!((String)args.get(0)).isEmpty()) throw new CheckNotEnoughElementsException("there should be no arguments in the \"MINUS\" command");
         return true;
     }
 
