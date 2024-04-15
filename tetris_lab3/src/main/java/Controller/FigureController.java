@@ -18,6 +18,9 @@ public final class FigureController {
     int deactivateCounter = 0;
     public boolean currentFigureIsActive = true;
 
+    public Sound music = new Sound(); // controller
+    public static Sound soundEffect = new Sound();
+
     private int extremeCoordinateLeftX;
     private int extremeCoordinateRightX;
     List<Block> tempBlocks = new ArrayList<>(); //for check rotate
