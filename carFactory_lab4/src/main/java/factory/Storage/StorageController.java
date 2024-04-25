@@ -1,15 +1,20 @@
 package factory.Storage;
 
 import factory.Storage.AccessoriesWarehouse.AccessoriesStorage;
+import factory.Storage.AccessoriesWarehouse.AccessoryController;
 import factory.Storage.BodyWarehouse.BodyStorage;
 import factory.Storage.CarWarehouse.CarStorage;
 import factory.Storage.EngineWarehouse.EngineStorage;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 public class StorageController {
     AccessoriesStorage accessoriesStorage;
     BodyStorage bodyStorage;
     EngineStorage engineStorage;
     CarStorage carStorage;
+
+    private boolean isActive = true;
 
     public StorageController(final int accessoryCapacity, final int bodyCapacity, final int engineCapacity, final int carCapacity) {
         accessoriesStorage = new AccessoriesStorage(accessoryCapacity);
@@ -18,36 +23,24 @@ public class StorageController {
         carStorage = new CarStorage(carCapacity);
     }
 
-    public int getAccessoriesCount() {
-        return accessoriesStorage.getNumberOfAccessories();
+    public AccessoriesStorage getAccessoryStorage() {
+        return accessoriesStorage;
     }
 
-    public int getBodyCount() {
-        return bodyStorage.getNumOfBodies();
+    public BodyStorage getBodyStorage() {
+        return bodyStorage;
     }
 
-    public int getEngineCount() {
-        return engineStorage.getNumOfEngines();
+    public EngineStorage getEngineStorage() {
+        return engineStorage;
     }
 
-    public int getTotalAccessoriesProduced() {
-        return accessoriesStorage.getTotalProduced();
+    public CarStorage getCarStorage() {
+        return carStorage;
     }
 
-    public int getTotalBodyProduced() {
-        return bodyStorage.getTotalProduced();
+    public void startFactory(final int numberOfAccessory, final int numberOfBody, final int numberOfEngine) {
+        AccessoryController accessoryController = new AccessoryController(accessoriesStorage, numberOfAccessory);
+        accessoryController.start();
     }
-
-    public int getTotalEngineProduced() {
-        return engineStorage.getTotalProduced();
-    }
-
-    public int getTotalCarProduced() {
-        return carStorage.getTotalProduced();
-    }
-
-    public int getCarsCount() {
-        return carStorage.getNumberOfCars();
-    }
-
 }

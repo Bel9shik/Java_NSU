@@ -6,7 +6,10 @@ public class StartFactory {
         //in future program start in controller
         ConfigFileParser configFileParser = new ConfigFileParser("config.properties");
         StorageController storageController = new StorageController(configFileParser.getAccessoriesCapacity(), configFileParser.getBodiesCapacity(), configFileParser.getEnginesCapacity(), configFileParser.getCarsCapacity());
-        System.out.println(configFileParser.getBodiesCapacity());
         ViewController viewController = new ViewController(storageController);
+        storageController.startFactory(configFileParser.getAccessorySuppliers(), configFileParser.getBodySuppliers(), configFileParser.getEngineSuppliers());
+        while (true) {
+            viewController.update();
+        }
     }
 }

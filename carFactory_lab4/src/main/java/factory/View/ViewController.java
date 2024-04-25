@@ -5,12 +5,14 @@ import factory.Storage.StorageController;
 import javax.swing.*;
 
 public class ViewController {
-    private JFrame frame;
-    private FactoryPanel factory;
-    private StorageController storageController;
+    private final JFrame frame;
+    private final FactoryPanel factoryPanel;
     public ViewController (StorageController storageController) {
-        this.storageController = storageController;
-        factory = new FactoryPanel(storageController);
-        frame = new CreateFrame("Bel9sh production", factory);
+        factoryPanel = new FactoryPanel(storageController);
+        frame = new CreateFrame("Bel9sh production", factoryPanel);
+    }
+
+    public void update() {
+        factoryPanel.updateData();
     }
 }
