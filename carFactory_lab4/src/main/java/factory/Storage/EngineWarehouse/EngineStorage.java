@@ -1,15 +1,41 @@
 package factory.Storage.EngineWarehouse;
 
+import factory.Storage.BodyWarehouse.Body;
+
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class EngineStorage {
-    private int numOfEngines;
+    private AtomicInteger numOfEngines;
     private int totalProduced;
     private final int maxCapacity;
     private int frequency;
+    ArrayList<Engine> engines;
+    private final ReentrantLock lock;
 
     public EngineStorage(int maxCapacity) {
         this.maxCapacity = maxCapacity;
-        numOfEngines = 0;
+        numOfEngines = new AtomicInteger(0);
         totalProduced = 0;
+        engines = new ArrayList<>(maxCapacity);
+        lock = new ReentrantLock();
+    }
+
+    public synchronized boolean isEmpty() {
+        return numOfEngines.get() <= 0;
+    }
+
+    public synchronized Engine getEngine() {
+        lock.lock();
+        Engine engine = engines.get(numOfEngines.getAndDecrement() - 1);
+        engines.remove(engine);
+        lock.unlock();
+        return engine;
+    }
+
+    public int getMaxCapacity() {
+        return maxCapacity;
     }
 
     public int getFrequency() {
@@ -21,27 +47,17 @@ public class EngineStorage {
     }
 
     public int getNumOfEngines() {
-        return numOfEngines;
+        return numOfEngines.get();
     }
 
-    public void increaseNumOfEngines() {
-        numOfEngines++;
-    }
-
-    public void decreaseNumOfEngines() {
-        numOfEngines--;
+    public synchronized void increaseNumOfEngines(Engine engine) {
+        numOfEngines.incrementAndGet();
+        engines.add(engine);
+        totalProduced++;
     }
 
     public int getTotalProduced() {
         return totalProduced;
-    }
-
-    public void increaseTotalProduced() {
-        totalProduced++;
-    }
-
-    public void decreaseTotalProduced() {
-        totalProduced--;
     }
 
 }

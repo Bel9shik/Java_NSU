@@ -1,24 +1,40 @@
 package factory.Storage.AccessoriesWarehouse;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class AccessoriesStorage {
-    private ArrayList<Accessory> accessories;
+    private final ReentrantLock lock;
+    private final ArrayList<Accessory> accessories;
 
-    private int numberOfAccessories;
+    private final AtomicInteger numOfAccessories;
     private int totalProduced;
     private final int maxCapacity;
     private int frequency;
 
-    public int getMaxCapacity() {
-        return maxCapacity;
-    }
-
     public AccessoriesStorage(int maxCapacity) {
         this.maxCapacity = maxCapacity;
-        numberOfAccessories = 0;
+        numOfAccessories = new AtomicInteger(0);
         totalProduced = 0;
-        accessories = new ArrayList<>();
+        accessories = new ArrayList<>(maxCapacity);
+        lock = new ReentrantLock();
+    }
+
+    public synchronized boolean isEmpty() {
+        return numOfAccessories.get() <= 0;
+    }
+
+    public synchronized Accessory getAccessory() {
+        lock.lock();
+        Accessory accessory = accessories.get(numOfAccessories.getAndDecrement() - 1);
+        accessories.remove(accessory);
+        lock.unlock();
+        return accessory;
+    }
+
+    public int getMaxCapacity() {
+        return maxCapacity;
     }
 
     public int getFrequency() {
@@ -29,29 +45,17 @@ public class AccessoriesStorage {
         this.frequency = frequency;
     }
 
-    public int getNumberOfAccessories() {
-        return numberOfAccessories;
+    public int getNumOfAccessories() {
+        return numOfAccessories.get();
     }
 
     public synchronized void increaseNumberOfAccessories(Accessory accessory) {
-        numberOfAccessories++;
+        numOfAccessories.incrementAndGet();
         accessories.add(accessory);
-        increaseTotalProduced();
-    }
-
-    public synchronized void decreaseNumberOfAccessories() {
-        numberOfAccessories--;
+        totalProduced++;
     }
 
     public int getTotalProduced() {
         return totalProduced;
-    }
-
-    public synchronized void increaseTotalProduced() {
-        totalProduced++;
-    }
-
-    public synchronized void decreaseTotalProduced() {
-        totalProduced--;
     }
 }
