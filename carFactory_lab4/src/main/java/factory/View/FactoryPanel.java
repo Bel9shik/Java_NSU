@@ -26,6 +26,7 @@ public class FactoryPanel extends JPanel {
 
     private final JLabel carInStock;
     private final JLabel carTotalProduced;
+    private final JLabel waitedCars;
 
     public FactoryPanel(StorageController storageController) {
         this.storageController = storageController;
@@ -120,10 +121,12 @@ public class FactoryPanel extends JPanel {
         carInStock = new JLabel("Number of cars in stock: " + storageController.getCarStorage().getNumberOfCars());
         flow.add(carInStock);
         carTotalProduced = new JLabel("Total cars produced: " + storageController.getCarStorage().getTotalProduced());
+        waitedCars = new JLabel("Waited cars: " + storageController.getCarStorage().getWaitedCars());
         flow.add(carTotalProduced);
         flow.add(accessoryLabel);
         flow.add(bodyLabel);
         flow.add(engineLabel);
+        flow.add(waitedCars);
 
         mainPanel = flow;
     }
@@ -137,6 +140,7 @@ public class FactoryPanel extends JPanel {
         engineTotal.setText(String.valueOf(storageController.getEngineStorage().getTotalProduced()));
         carInStock.setText("Number of cars in stock: " + storageController.getCarStorage().getNumberOfCars());
         carTotalProduced.setText("Total cars produced: " + storageController.getCarStorage().getTotalProduced());
+        waitedCars.setText("Waited cars: " + storageController.getCarStorage().getWaitedCars());
 
         revalidate();
         repaint();

@@ -18,7 +18,7 @@ public class Worker implements Runnable {
     private final CarStorage carStorage;
     private final AtomicInteger counter;
 
-    public Worker(AccessoriesStorage accessoriesStorage, BodyStorage bodyStorage, EngineStorage engineStorage, CarStorage carStorage, AtomicInteger counter) {
+    public Worker(final AccessoriesStorage accessoriesStorage, final BodyStorage bodyStorage, final EngineStorage engineStorage, final CarStorage carStorage, final AtomicInteger counter) {
         this.accessoriesStorage = accessoriesStorage;
         this.bodyStorage = bodyStorage;
         this.engineStorage = engineStorage;
@@ -28,37 +28,20 @@ public class Worker implements Runnable {
 
     @Override
     public void run() {
-        Accessory accessory = null;
-        Body body = null;
-        Engine engine = null;
-        Car car;
         synchronized (this) {
-            while(!Thread.currentThread().isInterrupted()) {
-                if (carStorage.isFull()) {
-                    try {
-                        wait(10);
-                    } catch (InterruptedException ignored) {} //mb log needed
-                } else {
-                    if (!accessoriesStorage.isEmpty() && accessory == null) {
-                        accessory = accessoriesStorage.getAccessory();
-                    }
-                    if (!bodyStorage.isEmpty() && body == null) {
-                        body = bodyStorage.getBody();
-                    }
-                    if (!engineStorage.isEmpty() && engine == null) {
-                        engine = engineStorage.getEngine();
-                    }
-                    if (engine != null && body != null && accessory != null) {
-                        car = new Car(accessory, body, engine, counter.getAndIncrement());
-                        carStorage.increaseNumberOfCars(car);
-                        accessory = null;
-                        body = null;
-                        engine = null;
-                    }
-                }
+            Accessory accessory;
+            Body body;
+            Engine engine;
+            Car car;
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    wait(100);
-                } catch (InterruptedException ignored) {}
+                    accessory = accessoriesStorage.getAccessory();
+                    body = bodyStorage.getBody();
+                    engine = engineStorage.getEngine();
+                    car = new Car(accessory, body, engine, counter.getAndIncrement());
+                    carStorage.addCar(car);
+                } catch (InterruptedException ignored) {
+                }
             }
         }
     }

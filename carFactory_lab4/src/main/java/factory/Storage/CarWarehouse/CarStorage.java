@@ -4,17 +4,19 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CarStorage {
-    private AtomicInteger numberOfCars;
+    private final AtomicInteger numberOfCars;
     private int totalProduced;
     private final int maxCapacity;
     private final ArrayList<Car> cars;
     private int frequency;
+    private final AtomicInteger waitedCars;
 
     public CarStorage(int maxCapacity) {
         this.maxCapacity = maxCapacity;
         numberOfCars = new AtomicInteger(0);
         totalProduced = 0;
         cars = new ArrayList<>(maxCapacity);
+        waitedCars = new AtomicInteger(0);
     }
 
     public synchronized void setFrequency(int frequency) {
@@ -29,24 +31,34 @@ public class CarStorage {
         return numberOfCars.get() == maxCapacity;
     }
 
-    public synchronized Car getCar() {
-        if (numberOfCars.get() == 0) {
-            return null;
-        } else {
-            Car car = cars.get(numberOfCars.getAndDecrement() - 1);
-            cars.remove(car);
-            return car;
+    public synchronized Car getCar() throws InterruptedException {
+        waitedCars.incrementAndGet();
+        while (numberOfCars.get() == 0) {
+            wait();
         }
+        Car car = cars.get(numberOfCars.getAndDecrement() - 1);
+        cars.remove(car);
+        notifyAll();
+        waitedCars.decrementAndGet();
+        return car;
+    }
+
+    public synchronized int getWaitedCars() {
+        return waitedCars.get();
     }
 
     public synchronized int getNumberOfCars() {
         return numberOfCars.get();
     }
 
-    public synchronized void increaseNumberOfCars(Car car) {
+    public synchronized void addCar(Car car) throws InterruptedException {
+        while (numberOfCars.get() == maxCapacity) {
+            wait();
+        }
         numberOfCars.getAndIncrement();
         cars.add(car);
         totalProduced++;
+        notifyAll();
     }
 
     public synchronized int getTotalProduced() {

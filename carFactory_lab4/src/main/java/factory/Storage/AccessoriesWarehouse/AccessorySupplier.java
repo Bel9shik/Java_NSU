@@ -2,7 +2,7 @@ package factory.Storage.AccessoriesWarehouse;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AccessorySupplier implements Runnable{
+public class AccessorySupplier implements Runnable {
     private final AccessoriesStorage accessoriesStorage;
     private final AtomicInteger counter;
 
@@ -19,16 +19,14 @@ public class AccessorySupplier implements Runnable{
 
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
-            synchronized (this) {
-                if (accessoriesStorage.getNumOfAccessories() < accessoriesStorage.getMaxCapacity()) {
-                    if (accessoriesStorage.getFrequency() == 0) continue;
-                    accessoriesStorage.increaseNumberOfAccessories(new Accessory(counter.getAndIncrement()));
-                }
+        synchronized (this) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    wait(accessoriesStorage.getFrequency());
+                    accessoriesStorage.addAccessory(new Accessory(counter.getAndIncrement()));
+                    wait(accessoriesStorage.getFrequency() + 1);
                 } catch (InterruptedException ignored) {}
             }
         }
     }
 }
+

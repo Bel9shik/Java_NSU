@@ -2,7 +2,7 @@ package factory.Storage.EngineWarehouse;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class EngineSupplier implements  Runnable {
+public class EngineSupplier implements Runnable {
     EngineStorage engineStorage;
     AtomicInteger counter;
 
@@ -15,14 +15,11 @@ public class EngineSupplier implements  Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             synchronized (this) {
-                if (engineStorage.getNumOfEngines() < engineStorage.getMaxCapacity()) {
-                    if (engineStorage.getFrequency() == 0) continue;
-                    engineStorage.increaseNumOfEngines(new Engine(counter.getAndIncrement()));
-                }
-
                 try {
-                    wait(engineStorage.getFrequency());
-                } catch (InterruptedException ignored) {}
+                    engineStorage.addEngine(new Engine(counter.getAndIncrement()));
+                    wait(engineStorage.getFrequency() + 1);
+                } catch (InterruptedException ignored) {
+                }
             }
         }
     }

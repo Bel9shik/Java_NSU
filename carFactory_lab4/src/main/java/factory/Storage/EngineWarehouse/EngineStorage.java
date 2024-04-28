@@ -1,10 +1,7 @@
 package factory.Storage.EngineWarehouse;
 
-import factory.Storage.BodyWarehouse.Body;
-
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class EngineStorage {
     private final AtomicInteger numOfEngines;
@@ -12,42 +9,26 @@ public class EngineStorage {
     private final int maxCapacity;
     private int frequency;
     private final ArrayList<Engine> engines;
-    private final ReentrantLock lock;
 
     public EngineStorage(int maxCapacity) {
         this.maxCapacity = maxCapacity;
         numOfEngines = new AtomicInteger(0);
         totalProduced = 0;
         engines = new ArrayList<>(maxCapacity);
-        lock = new ReentrantLock();
     }
 
     public synchronized boolean isEmpty() {
         return numOfEngines.get() <= 0;
     }
 
-    public synchronized Engine getEngine() {
-        lock.lock();
+    public synchronized Engine getEngine() throws InterruptedException {
         if (numOfEngines.get() == 0) {
-            try {
-                return null;
-            } finally {
-                lock.unlock();
-            }
-        } else {
-            try {
-                Engine engine = engines.get(numOfEngines.getAndDecrement() - 1);
-                engines.remove(engine);
-                return engine;
-            }
-             finally {
-                lock.unlock();
-            }
+            wait();
         }
-    }
-
-    public int getMaxCapacity() {
-        return maxCapacity;
+        Engine engine = engines.get(numOfEngines.getAndDecrement() - 1);
+        engines.remove(engine);
+        notifyAll();
+        return engine;
     }
 
     public synchronized int getFrequency() {
@@ -62,10 +43,14 @@ public class EngineStorage {
         return numOfEngines.get();
     }
 
-    public synchronized void increaseNumOfEngines(Engine engine) {
+    public synchronized void addEngine(Engine engine) throws InterruptedException {
+        while (numOfEngines.get() == maxCapacity) {
+            wait();
+        }
         numOfEngines.incrementAndGet();
         engines.add(engine);
         totalProduced++;
+        notifyAll();
     }
 
     public int getTotalProduced() {

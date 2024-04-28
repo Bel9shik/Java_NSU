@@ -2,10 +2,8 @@ package factory.Storage.AccessoriesWarehouse;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class AccessoriesStorage {
-    private final ReentrantLock lock;
     private final ArrayList<Accessory> accessories;
 
     private final AtomicInteger numOfAccessories;
@@ -18,34 +16,16 @@ public class AccessoriesStorage {
         numOfAccessories = new AtomicInteger(0);
         totalProduced = 0;
         accessories = new ArrayList<>(maxCapacity);
-        lock = new ReentrantLock();
     }
 
-    public synchronized boolean isEmpty() {
-        return numOfAccessories.get() <= 0;
-    }
-
-    public synchronized Accessory getAccessory() {
-        lock.lock();
-        if (numOfAccessories.get() == 0) {
-            try {
-                return null;
-            } finally {
-                lock.unlock();
-            }
-        } else {
-            try {
-                Accessory accessory = accessories.get(numOfAccessories.getAndDecrement() - 1);
-                accessories.remove(accessory);
-                return accessory;
-            } finally {
-                lock.unlock();
-            }
+    public synchronized Accessory getAccessory() throws InterruptedException {
+        while (numOfAccessories.get() == 0) {
+            wait();
         }
-    }
-
-    public int getMaxCapacity() {
-        return maxCapacity;
+        Accessory accessory = accessories.get(numOfAccessories.getAndDecrement() - 1);
+        accessories.remove(accessory);
+        notifyAll();
+        return accessory;
     }
 
     public synchronized int getFrequency() {
@@ -60,10 +40,14 @@ public class AccessoriesStorage {
         return numOfAccessories.get();
     }
 
-    public synchronized void increaseNumberOfAccessories(Accessory accessory) {
-        numOfAccessories.incrementAndGet();
+    public synchronized void addAccessory(Accessory accessory) throws InterruptedException {
+        while (numOfAccessories.get() == maxCapacity) {
+            wait();
+        }
         accessories.add(accessory);
         totalProduced++;
+        numOfAccessories.incrementAndGet();
+        notifyAll();
     }
 
     public int getTotalProduced() {

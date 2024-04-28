@@ -3,26 +3,41 @@ package factory.Storage;
 import factory.Storage.CarWarehouse.Car;
 import factory.Storage.CarWarehouse.CarStorage;
 
-public class Dealer implements Runnable {
-    CarStorage carStorage;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
-    public Dealer (CarStorage carStorage) {
+public class Dealer implements Runnable {
+    private final CarStorage carStorage;
+    private final boolean isLogging;
+
+    public Dealer(final CarStorage carStorage, final boolean isLogging) {
         this.carStorage = carStorage;
+        this.isLogging = isLogging;
     }
 
     @Override
     public void run() {
         synchronized (this) {
+            BufferedWriter bufferedWriter = null;
+            if (isLogging) {
+                try {
+                    bufferedWriter = new BufferedWriter(new FileWriter("cars.txt"));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    if (carStorage.getFrequency() == 0) continue;
-                    wait(carStorage.getFrequency());
+                    wait(carStorage.getFrequency() + 1);
                     Car car = carStorage.getCar();
-                    if (car != null) {
-                        System.out.println(Thread.currentThread().getName() + ": " + car);
+                    if (bufferedWriter != null) {
+                        bufferedWriter.write(Thread.currentThread().getName() + ": " + car + "\n");
                     }
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException | IOException ignored) {
+                }
             }
         }
     }
 }
+

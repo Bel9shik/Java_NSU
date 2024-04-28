@@ -2,7 +2,6 @@ package factory.Storage.BodyWarehouse;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class BodyStorage {
     private AtomicInteger numOfBodies;
@@ -10,14 +9,12 @@ public class BodyStorage {
     private final int maxCapacity;
     private int frequency;
     private final ArrayList<Body> bodyStorage;
-    private final ReentrantLock lock;
 
     public int getMaxCapacity() {
         return maxCapacity;
     }
 
     public BodyStorage(int maxCapacity) {
-        lock = new ReentrantLock();
         this.maxCapacity = maxCapacity;
         numOfBodies = new AtomicInteger(0);
         totalProduced = 0;
@@ -28,24 +25,16 @@ public class BodyStorage {
         return numOfBodies.get() <= 0;
     }
 
-    public synchronized Body getBody() {
-        lock.lock();
-        if (numOfBodies.get() == 0) {
-            try {
-                return null;
-            } finally {
-                lock.unlock();
-            }
-        } else {
-            try {
-                Body body = bodyStorage.get(numOfBodies.getAndDecrement() - 1);
-                bodyStorage.remove(body);
-                return body;
-            } finally {
-                lock.unlock();
-            }
+    public synchronized Body getBody() throws InterruptedException {
+        while (numOfBodies.get() == 0) {
+            wait();
         }
+        Body body = bodyStorage.get(numOfBodies.getAndDecrement() - 1);
+        bodyStorage.remove(body);
+        notifyAll();
+        return body;
     }
+
 
     public synchronized int getFrequency() {
         return frequency;
@@ -59,10 +48,14 @@ public class BodyStorage {
         return numOfBodies.get();
     }
 
-    public synchronized void increaseNumOfBodies(Body newBody) {
-        numOfBodies.incrementAndGet();
+    public synchronized void addBody(Body newBody) throws InterruptedException {
+        while (numOfBodies.get() == maxCapacity) {
+            wait();
+        }
         bodyStorage.add(newBody);
         totalProduced++;
+        numOfBodies.incrementAndGet();
+        notifyAll();
     }
 
     public synchronized int getTotalProduced() {

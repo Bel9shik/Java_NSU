@@ -17,7 +17,9 @@ public class CarController implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             if (carStorage.isFull()) {
-
+                try {
+                    wait();
+                } catch (InterruptedException ignored) {}
             }
         }
     }
