@@ -17,7 +17,7 @@ public class CarStorage {
         cars = new ArrayList<>(maxCapacity);
     }
 
-    public void setFrequency(int frequency) {
+    public synchronized void setFrequency(int frequency) {
         this.frequency = frequency;
     }
 

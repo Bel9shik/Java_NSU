@@ -51,7 +51,7 @@ public class BodyStorage {
         return frequency;
     }
 
-    public void setFrequency(int frequency) {
+    public synchronized void setFrequency(int frequency) {
         this.frequency = frequency;
     }
 

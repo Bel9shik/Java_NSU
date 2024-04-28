@@ -45,7 +45,7 @@ public class StorageController {
         bodyStorage = new BodyStorage(bodyCapacity);
         engineStorage = new EngineStorage(engineCapacity);
         carStorage = new CarStorage(carCapacity);
-        threads = new ArrayList<>(dealersQuantity);
+        threads = new ArrayList<>(dealersQuantity + 1);
         carController = new CarController(carStorage);
         curDealersFreq = dealersQuantity;
         carsCounter = new AtomicInteger(0);

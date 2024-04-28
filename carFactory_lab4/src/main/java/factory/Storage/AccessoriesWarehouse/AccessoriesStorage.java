@@ -48,7 +48,7 @@ public class AccessoriesStorage {
         return maxCapacity;
     }
 
-    public int getFrequency() {
+    public synchronized int getFrequency() {
         return frequency;
     }
 

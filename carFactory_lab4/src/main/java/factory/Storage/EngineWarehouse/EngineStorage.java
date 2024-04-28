@@ -7,11 +7,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class EngineStorage {
-    private AtomicInteger numOfEngines;
+    private final AtomicInteger numOfEngines;
     private int totalProduced;
     private final int maxCapacity;
     private int frequency;
-    ArrayList<Engine> engines;
+    private final ArrayList<Engine> engines;
     private final ReentrantLock lock;
 
     public EngineStorage(int maxCapacity) {
@@ -50,15 +50,15 @@ public class EngineStorage {
         return maxCapacity;
     }
 
-    public int getFrequency() {
+    public synchronized int getFrequency() {
         return frequency;
     }
 
-    public void setFrequency(int frequency) {
+    public synchronized void setFrequency(int frequency) {
         this.frequency = frequency;
     }
 
-    public int getNumOfEngines() {
+    public synchronized int getNumOfEngines() {
         return numOfEngines.get();
     }
 
