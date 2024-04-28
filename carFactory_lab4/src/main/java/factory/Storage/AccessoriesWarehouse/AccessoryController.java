@@ -1,46 +1,40 @@
 package factory.Storage.AccessoriesWarehouse;
 
-import factory.Storage.StorageController;
-
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AccessoryController implements Runnable {
-    private AccessoriesStorage accessoriesStorage;
+    private final AccessoriesStorage accessoriesStorage;
+    private final ArrayList<Thread> suppliers;
     private final int countAccessory;
-    private boolean isActive = true;
-    AtomicInteger counter = new AtomicInteger(0);
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     public AccessoryController(AccessoriesStorage accessoriesStorage, int countAccessory) {
         this.countAccessory = countAccessory;
         this.accessoriesStorage = accessoriesStorage;
-    }
-
-    public void start() {
-        for (int i = 0; i < countAccessory; i++) {
-            Thread tmp = new Thread(this);
-            tmp.setName("AccessorySupplier " + (i + 1));
-            tmp.start();
-        }
-
+        suppliers = new ArrayList<>(countAccessory);
     }
 
     public void stop() {
-        isActive = false;
+        synchronized (this) {
+            notify();
+        }
     }
 
     @Override
     public void run() {
-        while (isActive) {
-            synchronized (this) {
-                if (accessoriesStorage.getNumOfAccessories() < accessoriesStorage.getMaxCapacity()) {
-                    if (accessoriesStorage.getFrequency() == 0) continue;
-                    accessoriesStorage.increaseNumberOfAccessories(new Accessory(counter.getAndIncrement()));
-                }
-                try {
-                    wait(StorageController.ACCESSORY_FREQUENCY - accessoriesStorage.getFrequency() + 1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        synchronized (this) {
+            for (int i = 0; i < countAccessory; i++) {
+                Thread tmp = new Thread(new AccessorySupplier(accessoriesStorage, counter));
+                tmp.setName("AccessorySupplier " + (i + 1));
+                suppliers.add(tmp);
+                tmp.start();
+            }
+
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                suppliers.forEach(Thread::interrupt);
             }
         }
     }

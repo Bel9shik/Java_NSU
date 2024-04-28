@@ -28,10 +28,22 @@ public class EngineStorage {
 
     public synchronized Engine getEngine() {
         lock.lock();
-        Engine engine = engines.get(numOfEngines.getAndDecrement() - 1);
-        engines.remove(engine);
-        lock.unlock();
-        return engine;
+        if (numOfEngines.get() == 0) {
+            try {
+                return null;
+            } finally {
+                lock.unlock();
+            }
+        } else {
+            try {
+                Engine engine = engines.get(numOfEngines.getAndDecrement() - 1);
+                engines.remove(engine);
+                return engine;
+            }
+             finally {
+                lock.unlock();
+            }
+        }
     }
 
     public int getMaxCapacity() {

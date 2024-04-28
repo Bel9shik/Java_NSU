@@ -5,4 +5,8 @@ public class Body {
     public Body(int ID) {
         this.ID = ID;
     }
+
+    public int getID() { //synchronized ?
+        return ID;
+    }
 }

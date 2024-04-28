@@ -2,45 +2,42 @@ package factory.Storage.EngineWarehouse;
 
 import factory.Storage.StorageController;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class EngineController implements Runnable{
     private final EngineStorage engineStorage;
     private final int countEngine;
-    private boolean isActive = true;
-    AtomicInteger counter = new AtomicInteger(0);
+    private final ArrayList<Thread> threads;
+    private final AtomicInteger counter;
 
     public EngineController(EngineStorage engineStorage, int countEngine) {
         this.engineStorage = engineStorage;
         this.countEngine = countEngine;
-    }
-
-    public void start() {
-        for (int i = 0; i < countEngine; i++) {
-            Thread thread = new Thread(this);
-            thread.setName("EngineSupplier" + (i + 1));
-            thread.start();
-        }
+        threads = new ArrayList<>(countEngine);
+        counter = new AtomicInteger(0);
     }
 
     public void stop() {
-        isActive = false;
+        synchronized (this) {
+            notifyAll();
+        }
     }
 
     @Override
     public void run() {
-        while (isActive) {
-            synchronized (this) {
-                if (engineStorage.getNumOfEngines() < engineStorage.getMaxCapacity()) {
-                    if (engineStorage.getFrequency() == 0) continue;
-                    engineStorage.increaseNumOfEngines(new Engine(counter.getAndIncrement()));
-                }
+        synchronized (this) {
+            for (int i = 0; i < countEngine; i++) {
+                Thread thread = new Thread(new EngineSupplier(engineStorage, counter));
+                thread.setName("EngineSupplier" + (i + 1));
+                threads.add(thread);
+                thread.start();
+            }
 
-                try {
-                    wait(StorageController.ENGINES_FREQUENCY - engineStorage.getFrequency() + 1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                wait();
+            } catch (InterruptedException ignored) {
+                threads.forEach(Thread::interrupt);
             }
         }
     }

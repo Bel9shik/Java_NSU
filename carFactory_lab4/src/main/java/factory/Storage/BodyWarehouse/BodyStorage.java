@@ -30,14 +30,24 @@ public class BodyStorage {
 
     public synchronized Body getBody() {
         lock.lock();
-
-        Body body = bodyStorage.get(numOfBodies.getAndDecrement() - 1);
-        bodyStorage.remove(body);
-        lock.unlock();
-        return body;
+        if (numOfBodies.get() == 0) {
+            try {
+                return null;
+            } finally {
+                lock.unlock();
+            }
+        } else {
+            try {
+                Body body = bodyStorage.get(numOfBodies.getAndDecrement() - 1);
+                bodyStorage.remove(body);
+                return body;
+            } finally {
+                lock.unlock();
+            }
+        }
     }
 
-    public int getFrequency() {
+    public synchronized int getFrequency() {
         return frequency;
     }
 
@@ -45,7 +55,7 @@ public class BodyStorage {
         this.frequency = frequency;
     }
 
-    public int getNumOfBodies() {
+    public synchronized int getNumOfBodies() {
         return numOfBodies.get();
     }
 

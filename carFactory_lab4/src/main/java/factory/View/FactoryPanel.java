@@ -35,7 +35,7 @@ public class FactoryPanel extends JPanel {
         JSlider speedSlider = new JSlider(0, StorageController.ACCESSORY_FREQUENCY, 10);
 
         grid.add(new JLabel("Type"));
-        grid.add(new JLabel("Speed"));
+        grid.add(new JLabel("Delay"));
         grid.add(new JLabel("Available"));
         grid.add(new JLabel("Total"));
 
@@ -86,7 +86,7 @@ public class FactoryPanel extends JPanel {
         storageController.getEngineStorage().setFrequency(10);
         speedSlider.addChangeListener(e -> {
             int frequency = ((JSlider) e.getSource()).getValue();
-            storageController.getEngineStorage().setFrequency(frequency);
+            storageController.getEngineStorage().setFrequency(frequency);//TODO: freq gets from storageController. Not engine/body storage
             engineLabel.setText("Produce engines: " + frequency);
         });
         speedSlider.setPaintTrack(false);
@@ -98,14 +98,16 @@ public class FactoryPanel extends JPanel {
         grid.add(engineTotal);
 
         grid.add(new JLabel("Dealers: "));
-        speedSlider = new JSlider(0, storageController.getDealersQuantity(), storageController.getDealersQuantity());
-        JLabel dealersTotal = new JLabel(String.valueOf(storageController.getDealersQuantity()));
+        speedSlider = new JSlider(0, StorageController.DEALERS_FREQUENCY, storageController.getDealersQuantity());
+        JLabel dealersTotal = new JLabel(String.valueOf(StorageController.DEALERS_FREQUENCY)); // change dealers on panel
         dealersCurrent = new JLabel("" + speedSlider.getValue());
+        storageController.getCarStorage().setFrequency(speedSlider.getValue());
         speedSlider.addChangeListener(e -> {
+            storageController.getCarStorage().setFrequency(((JSlider) e.getSource()).getValue());
             dealersCurrent.setText("" + ((JSlider) e.getSource()).getValue());
         });
         speedSlider.setPaintTrack(false);
-        speedSlider.setMajorTickSpacing(4);
+        speedSlider.setMajorTickSpacing(20);
         speedSlider.setPaintLabels(true);
         speedSlider.setPaintTicks(true);
         grid.add(speedSlider);

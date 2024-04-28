@@ -1,31 +1,31 @@
 package factory.Storage;
 
 import factory.Storage.AccessoriesWarehouse.AccessoriesStorage;
-import factory.Storage.AccessoriesWarehouse.Accessory;
 import factory.Storage.AccessoriesWarehouse.AccessoryController;
-import factory.Storage.BodyWarehouse.Body;
 import factory.Storage.BodyWarehouse.BodyController;
 import factory.Storage.BodyWarehouse.BodyStorage;
+import factory.Storage.CarWarehouse.CarController;
 import factory.Storage.CarWarehouse.CarStorage;
-import factory.Storage.EngineWarehouse.Engine;
 import factory.Storage.EngineWarehouse.EngineController;
 import factory.Storage.EngineWarehouse.EngineStorage;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class StorageController {
     public final static int ACCESSORY_FREQUENCY = 100;
     public final static int BODY_FREQUENCY = 100;
     public final static int ENGINES_FREQUENCY = 100;
+    public final static int DEALERS_FREQUENCY = 100;
     private final int dealersQuantity;
+    private int curDealersFreq;
+    private final AtomicInteger carsCounter;
 
     private boolean isActive = true;
 
     private final ArrayList<Thread> threads;
-    private final AtomicInteger counterAccessory;
-    private final AtomicInteger counterBody;
-    private final AtomicInteger counterEngine;
 
     AccessoriesStorage accessoriesStorage;
     AccessoryController accessoryController;
@@ -37,6 +37,7 @@ public class StorageController {
     EngineController engineController;
 
     CarStorage carStorage;
+    CarController carController;
 
     public StorageController(final int dealersQuantity, final int accessoryCapacity, final int bodyCapacity, final int engineCapacity, final int carCapacity) {
         this.dealersQuantity = dealersQuantity;
@@ -44,10 +45,10 @@ public class StorageController {
         bodyStorage = new BodyStorage(bodyCapacity);
         engineStorage = new EngineStorage(engineCapacity);
         carStorage = new CarStorage(carCapacity);
-        threads = new ArrayList<>(10);
-        counterAccessory = new AtomicInteger(0);
-        counterBody = new AtomicInteger(0);
-        counterEngine = new AtomicInteger(0);
+        threads = new ArrayList<>(dealersQuantity);
+        carController = new CarController(carStorage);
+        curDealersFreq = dealersQuantity;
+        carsCounter = new AtomicInteger(0);
     }
 
     public int getDealersQuantity() {
@@ -72,19 +73,43 @@ public class StorageController {
 
     public void startFactory(final int numberOfAccessory, final int numberOfBody, final int numberOfEngine, final int dealersQuantity, final int workersQuantity) {
         accessoryController = new AccessoryController(accessoriesStorage, numberOfAccessory);
-        accessoryController.start();
+        Thread tmp = new Thread(accessoryController);
+        tmp.setName("Accessory Controller");
+        threads.add(tmp);
+        tmp.start();
 
         bodyController = new BodyController(bodyStorage, numberOfBody);
-        bodyController.start();
+        tmp = new Thread(bodyController);
+        tmp.setName("Body Controller");
+        threads.add(tmp);
+        tmp.start();
 
         engineController = new EngineController(engineStorage, numberOfEngine);
-        engineController.start();
+        tmp = new Thread(engineController);
+        tmp.setName("Engine Controller");
+        threads.add(tmp);
+        tmp.start();
 
-        for (int i = 0; i < workersQuantity; i++) {
-            Thread tmp = new Thread(new Worker(accessoriesStorage, bodyStorage, engineStorage, carStorage));
-            tmp.setName("Worker " + i);
+//        for (int i = 0; i < workersQuantity; i++) {
+//            tmp = new Thread(new Worker(accessoriesStorage, bodyStorage, engineStorage, carStorage, carsCounter));
+//            tmp.setName("Worker " + i);
+//            threads.add(tmp);
+//            tmp.start();
+//        }
+
+        for (int i = 0; i < dealersQuantity; i++) {
+            tmp = new Thread(new Dealer(carStorage));
+            tmp.setName("Dealer " + i);
+            threads.add(tmp);
             tmp.start();
         }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        for (int i = 0; i < workersQuantity; i++) {
+            executorService.submit(new Worker(accessoriesStorage, bodyStorage, engineStorage, carStorage, carsCounter));
+        }
+
+        executorService.shutdown();
 
     }
 

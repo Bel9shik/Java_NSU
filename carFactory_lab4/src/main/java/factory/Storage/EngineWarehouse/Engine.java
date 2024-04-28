@@ -5,4 +5,8 @@ public class Engine {
     public Engine (int ID){
         this.ID = ID;
     }
+
+    public int getID () {
+        return ID;
+    }
 }

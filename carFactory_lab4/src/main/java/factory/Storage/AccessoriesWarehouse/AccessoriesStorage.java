@@ -27,10 +27,21 @@ public class AccessoriesStorage {
 
     public synchronized Accessory getAccessory() {
         lock.lock();
-        Accessory accessory = accessories.get(numOfAccessories.getAndDecrement() - 1);
-        accessories.remove(accessory);
-        lock.unlock();
-        return accessory;
+        if (numOfAccessories.get() == 0) {
+            try {
+                return null;
+            } finally {
+                lock.unlock();
+            }
+        } else {
+            try {
+                Accessory accessory = accessories.get(numOfAccessories.getAndDecrement() - 1);
+                accessories.remove(accessory);
+                return accessory;
+            } finally {
+                lock.unlock();
+            }
+        }
     }
 
     public int getMaxCapacity() {
