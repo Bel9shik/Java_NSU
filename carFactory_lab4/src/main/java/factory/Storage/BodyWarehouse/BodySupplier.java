@@ -1,7 +1,5 @@
 package factory.Storage.BodyWarehouse;
 
-import factory.Storage.AccessoriesWarehouse.Accessory;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BodySupplier implements Runnable {
@@ -21,7 +19,7 @@ public class BodySupplier implements Runnable {
                 while (!Thread.currentThread().isInterrupted()) {
                     try {
                         bodyStorage.addBody(new Body(counter.getAndIncrement()));
-                        wait(bodyStorage.getFrequency() + 1);
+                        wait(bodyStorage.getDelay() + 1);
                     } catch (InterruptedException ignored) {}
                 }
             }

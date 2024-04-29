@@ -33,7 +33,7 @@ public class FactoryPanel extends JPanel {
 
         JPanel grid = new JPanel(new GridLayout(5, 4, 4, 4));
         grid.setBounds(0, 0, 800, 200);
-        JSlider speedSlider = new JSlider(0, StorageController.ACCESSORY_FREQUENCY, 10);
+        JSlider speedSlider = new JSlider(0, StorageController.ACCESSORY_MAX_DELAY, 10);
 
         grid.add(new JLabel("Type"));
         grid.add(new JLabel("Delay"));
@@ -44,11 +44,11 @@ public class FactoryPanel extends JPanel {
         accessoryCurrent = new JLabel(String.valueOf(storageController.getAccessoryStorage().getNumOfAccessories()));
         accessoryTotal = new JLabel(String.valueOf(storageController.getAccessoryStorage().getTotalProduced()));
         accessoryLabel = new JLabel("Produce accessories: " + speedSlider.getValue());
-        storageController.getAccessoryStorage().setFrequency(10);
+        storageController.getAccessoryStorage().setDelay(10);
         speedSlider.addChangeListener(e -> {
-            int frequency = ((JSlider) e.getSource()).getValue();
-            storageController.getAccessoryStorage().setFrequency(frequency);
-            accessoryLabel.setText("Produce bodies: " + frequency);
+            int delay = ((JSlider) e.getSource()).getValue();
+            storageController.getAccessoryStorage().setDelay(delay);
+            accessoryLabel.setText("Produce bodies: " + delay);
         });
         speedSlider.setPaintTrack(false);
         speedSlider.setMajorTickSpacing(20);
@@ -60,15 +60,15 @@ public class FactoryPanel extends JPanel {
 
 
         grid.add(new JLabel("Bodies:"));
-        speedSlider = new JSlider(0, StorageController.BODY_FREQUENCY, 10);
+        speedSlider = new JSlider(0, StorageController.BODY_MAX_DELAY, 10);
         bodyCurrent = new JLabel(String.valueOf(storageController.getBodyStorage().getNumOfBodies()));
         bodyTotal = new JLabel(String.valueOf(storageController.getBodyStorage().getTotalProduced()));
         bodyLabel = new JLabel("Produce bodies: " + speedSlider.getValue());
-        storageController.getBodyStorage().setFrequency(10);
+        storageController.getBodyStorage().setDelay(10);
         speedSlider.addChangeListener(e -> {
-            int frequency = ((JSlider) e.getSource()).getValue();
-            storageController.getBodyStorage().setFrequency(frequency);
-            bodyLabel.setText("Produce bodies: " + frequency);
+            int delay = ((JSlider) e.getSource()).getValue();
+            storageController.getBodyStorage().setDelay(delay);
+            bodyLabel.setText("Produce bodies: " + delay);
         });
         speedSlider.setPaintTrack(false);
         speedSlider.setMajorTickSpacing(20);
@@ -80,15 +80,15 @@ public class FactoryPanel extends JPanel {
 
 
         grid.add(new JLabel("Engines:"));
-        speedSlider = new JSlider(0, StorageController.ENGINES_FREQUENCY, 10);
+        speedSlider = new JSlider(0, StorageController.ENGINES_MAX_DELAY, 10);
         engineCurrent = new JLabel(String.valueOf(storageController.getEngineStorage().getNumOfEngines()));
         engineTotal = new JLabel(String.valueOf(storageController.getEngineStorage().getTotalProduced()));
         engineLabel = new JLabel("Produce engines: " + speedSlider.getValue());
-        storageController.getEngineStorage().setFrequency(10);
+        storageController.getEngineStorage().setDelay(10);
         speedSlider.addChangeListener(e -> {
-            int frequency = ((JSlider) e.getSource()).getValue();
-            storageController.getEngineStorage().setFrequency(frequency);//TODO: freq gets from storageController. Not engine/body storage
-            engineLabel.setText("Produce engines: " + frequency);
+            int delay = ((JSlider) e.getSource()).getValue();
+            storageController.getEngineStorage().setDelay(delay);//TODO: freq gets from storageController. Not engine/body storage
+            engineLabel.setText("Produce engines: " + delay);
         });
         speedSlider.setPaintTrack(false);
         speedSlider.setMajorTickSpacing(20);
@@ -99,12 +99,12 @@ public class FactoryPanel extends JPanel {
         grid.add(engineTotal);
 
         grid.add(new JLabel("Dealers: "));
-        speedSlider = new JSlider(0, StorageController.DEALERS_FREQUENCY, storageController.getDealersQuantity());
-        JLabel dealersTotal = new JLabel(String.valueOf(StorageController.DEALERS_FREQUENCY)); // change dealers on panel
+        speedSlider = new JSlider(0, StorageController.DEALERS_MAX_DELAY, storageController.getDealersQuantity());
+        JLabel dealersTotal = new JLabel(String.valueOf(StorageController.DEALERS_MAX_DELAY)); // change dealers on panel
         dealersCurrent = new JLabel("" + speedSlider.getValue());
-        storageController.getCarStorage().setFrequency(speedSlider.getValue());
+        storageController.getCarStorage().setDelay(speedSlider.getValue());
         speedSlider.addChangeListener(e -> {
-            storageController.getCarStorage().setFrequency(((JSlider) e.getSource()).getValue());
+            storageController.getCarStorage().setDelay(((JSlider) e.getSource()).getValue());
             dealersCurrent.setText("" + ((JSlider) e.getSource()).getValue());
         });
         speedSlider.setPaintTrack(false);

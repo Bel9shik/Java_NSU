@@ -8,7 +8,7 @@ public class CarStorage {
     private int totalProduced;
     private final int maxCapacity;
     private final ArrayList<Car> cars;
-    private int frequency;
+    private int delay;
     private final AtomicInteger waitedCars;
 
     public CarStorage(int maxCapacity) {
@@ -19,12 +19,12 @@ public class CarStorage {
         waitedCars = new AtomicInteger(0);
     }
 
-    public synchronized void setFrequency(int frequency) {
-        this.frequency = frequency;
+    public synchronized void setDelay(int delay) {
+        this.delay = delay;
     }
 
-    public synchronized int getFrequency() {
-        return frequency;
+    public synchronized int getDelay() {
+        return delay;
     }
 
     public synchronized boolean isFull() {

@@ -7,7 +7,7 @@ public class BodyStorage {
     private AtomicInteger numOfBodies;
     private int totalProduced;
     private final int maxCapacity;
-    private int frequency;
+    private int delay;
     private final ArrayList<Body> bodyStorage;
 
     public int getMaxCapacity() {
@@ -36,12 +36,12 @@ public class BodyStorage {
     }
 
 
-    public synchronized int getFrequency() {
-        return frequency;
+    public synchronized int getDelay() {
+        return delay;
     }
 
-    public synchronized void setFrequency(int frequency) {
-        this.frequency = frequency;
+    public synchronized void setDelay(int delay) {
+        this.delay = delay;
     }
 
     public synchronized int getNumOfBodies() {

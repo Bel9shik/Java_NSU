@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public final class ConfigFileParser {
 
@@ -16,7 +15,7 @@ public final class ConfigFileParser {
                 arguments.add(line);
             }
         } catch (IOException ignored) {
-        } // write in log file about exception
+        }
     }
 
     public int getBodiesCapacity() {

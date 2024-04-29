@@ -17,7 +17,7 @@ public class EngineSupplier implements Runnable {
             synchronized (this) {
                 try {
                     engineStorage.addEngine(new Engine(counter.getAndIncrement()));
-                    wait(engineStorage.getFrequency() + 1);
+                    wait(engineStorage.getDelay() + 1);
                 } catch (InterruptedException ignored) {
                 }
             }

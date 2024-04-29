@@ -7,7 +7,7 @@ public class EngineStorage {
     private final AtomicInteger numOfEngines;
     private int totalProduced;
     private final int maxCapacity;
-    private int frequency;
+    private int delay;
     private final ArrayList<Engine> engines;
 
     public EngineStorage(int maxCapacity) {
@@ -31,12 +31,12 @@ public class EngineStorage {
         return engine;
     }
 
-    public synchronized int getFrequency() {
-        return frequency;
+    public synchronized int getDelay() {
+        return delay;
     }
 
-    public synchronized void setFrequency(int frequency) {
-        this.frequency = frequency;
+    public synchronized void setDelay(int delay) {
+        this.delay = delay;
     }
 
     public synchronized int getNumOfEngines() {

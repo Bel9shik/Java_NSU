@@ -23,7 +23,7 @@ public class AccessorySupplier implements Runnable {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     accessoriesStorage.addAccessory(new Accessory(counter.getAndIncrement()));
-                    wait(accessoriesStorage.getFrequency() + 1);
+                    wait(accessoriesStorage.getDelay() + 1);
                 } catch (InterruptedException ignored) {}
             }
         }

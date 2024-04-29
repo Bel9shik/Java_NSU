@@ -22,17 +22,18 @@ public class Dealer implements Runnable {
             BufferedWriter bufferedWriter = null;
             if (isLogging) {
                 try {
-                    bufferedWriter = new BufferedWriter(new FileWriter("cars.txt"));
+                    bufferedWriter = new BufferedWriter(new FileWriter("cars.txt", true));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    wait(carStorage.getFrequency() + 1);
+                    wait(carStorage.getDelay() + 1);
                     Car car = carStorage.getCar();
                     if (bufferedWriter != null) {
                         bufferedWriter.write(Thread.currentThread().getName() + ": " + car + "\n");
+                        bufferedWriter.close();
                     }
                 } catch (InterruptedException | IOException ignored) {
                 }

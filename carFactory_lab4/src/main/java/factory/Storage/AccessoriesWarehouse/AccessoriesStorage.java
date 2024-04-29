@@ -9,7 +9,7 @@ public class AccessoriesStorage {
     private final AtomicInteger numOfAccessories;
     private int totalProduced;
     private final int maxCapacity;
-    private int frequency;
+    private int delay;
 
     public AccessoriesStorage(int maxCapacity) {
         this.maxCapacity = maxCapacity;
@@ -28,12 +28,12 @@ public class AccessoriesStorage {
         return accessory;
     }
 
-    public synchronized int getFrequency() {
-        return frequency;
+    public synchronized int getDelay() {
+        return delay;
     }
 
-    public synchronized void setFrequency(int frequency) {
-        this.frequency = frequency;
+    public synchronized void setDelay(int delay) {
+        this.delay = delay;
     }
 
     public int getNumOfAccessories() {
