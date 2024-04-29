@@ -33,17 +33,14 @@ public class Worker implements Runnable {
             Body body;
             Engine engine;
             Car car;
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    wait();
-                    accessory = accessoriesStorage.getAccessory();
-                    body = bodyStorage.getBody();
-                    engine = engineStorage.getEngine();
-                    car = new Car(accessory, body, engine, counter.getAndIncrement());
-                    carStorage.addCar(car);
-                } catch (InterruptedException ignored) {
-                }
-            }
+            try {
+                wait(10);
+                accessory = accessoriesStorage.getAccessory();
+                body = bodyStorage.getBody();
+                engine = engineStorage.getEngine();
+                car = new Car(accessory, body, engine, counter.getAndIncrement());
+                carStorage.addCar(car);
+            } catch (InterruptedException ignored) {}
         }
     }
 }

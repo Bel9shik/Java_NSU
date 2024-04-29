@@ -11,10 +11,12 @@ import java.io.IOException;
 public class Dealer implements Runnable {
     private final CarStorage carStorage;
     private final boolean isLogging;
+    CarController carController;
 
     public Dealer(final CarStorage carStorage, final CarController carController, final boolean isLogging) {
         this.carStorage = carStorage;
         this.isLogging = isLogging;
+        this.carController = carController;
     }
 
     @Override
@@ -30,6 +32,7 @@ public class Dealer implements Runnable {
             }
             while (!Thread.currentThread().isInterrupted()) {
                 try {
+                    carController.setNewTaskExist();
                     wait(carStorage.getDelay() + 1);
                     Car car = carStorage.getCar();
                     if (bufferedWriter != null) {

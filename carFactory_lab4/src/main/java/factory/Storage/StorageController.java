@@ -11,8 +11,6 @@ import factory.Storage.EngineWarehouse.EngineController;
 import factory.Storage.EngineWarehouse.EngineStorage;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class StorageController {
@@ -94,13 +92,8 @@ public class StorageController {
         threads.add(tmp);
         tmp.start();
 
-        tmp = new Thread(workersThreadPool);
-        tmp.setName("Worker ThreadPool");
-        threads.add(tmp);
-        tmp.start();
-
         for (int i = 0; i < workersQuantity; i++) {
-            workersThreadPool.workerList.add(new Thread(new Worker(accessoriesStorage, bodyStorage, engineStorage, carStorage, carsCounter)));
+            workersThreadPool.addTask(new Thread(new Worker(accessoriesStorage, bodyStorage, engineStorage, carStorage, carsCounter)));
         }
 
         tmp = new Thread(carController);
@@ -122,6 +115,7 @@ public class StorageController {
         accessoryController.stop();
         bodyController.stop();
         engineController.stop();
+        workersThreadPool.shutdown();
         threads.forEach(Thread::interrupt);
     }
 

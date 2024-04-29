@@ -16,6 +16,10 @@ public class CarController implements Runnable{
     private final CarStorage carStorage;
     private final AtomicInteger counter;
 
+    boolean newTaskIsExist = false;
+    Worker worker;
+
+
     public CarController(WorkersThreadPool workersThreadPool, AccessoriesStorage accessoriesStorage, BodyStorage bodyStorage, EngineStorage engineStorage, CarStorage carStorage, AtomicInteger counter) {
         this.workersThreadPool = workersThreadPool;
         this.accessoriesStorage = accessoriesStorage;
@@ -23,20 +27,32 @@ public class CarController implements Runnable{
         this.engineStorage = engineStorage;
         this.carStorage = carStorage;
         this.counter = counter;
+        worker = new Worker(accessoriesStorage, bodyStorage, engineStorage, carStorage, counter);
+    }
+
+    private synchronized void waitNewTask() throws InterruptedException {
+        while (!newTaskIsExist) {
+            wait();
+        }
+        this.newTaskIsExist = false;
+    }
+
+    public synchronized void setNewTaskExist() {
+        this.newTaskIsExist = true;
+        notifyAll();
     }
 
     @Override
     public void run() {
         synchronized (this) {
             while (!Thread.currentThread().isInterrupted()) {
-                while (!carStorage.isFull()){
-                    try {
-                        wait(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    workersThreadPool.addTask(new Worker(accessoriesStorage, bodyStorage, engineStorage, carStorage, counter));
-                }
+                try {
+                    waitNewTask();
+                    carStorage.isFull();
+                } catch (InterruptedException ignored) {}
+
+                workersThreadPool.addTask(() -> worker.run());
+                workersThreadPool.addTask(() -> worker.run());
             }
         }
     }

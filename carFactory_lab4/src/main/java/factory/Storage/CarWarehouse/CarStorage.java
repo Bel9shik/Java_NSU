@@ -27,10 +27,10 @@ public class CarStorage {
         return delay;
     }
 
-    public synchronized boolean isFull() {
-        synchronized (numberOfCars) {
-            return numberOfCars.get() == maxCapacity;
-        }
+    public synchronized void isFull() throws InterruptedException {
+            while(numberOfCars.get() == maxCapacity) {
+                wait();
+            }
     }
 
     public synchronized Car getCar() throws InterruptedException {
