@@ -10,19 +10,11 @@ public class BodyStorage {
     private int delay;
     private final ArrayList<Body> bodyStorage;
 
-    public int getMaxCapacity() {
-        return maxCapacity;
-    }
-
     public BodyStorage(int maxCapacity) {
         this.maxCapacity = maxCapacity;
         numOfBodies = new AtomicInteger(0);
         totalProduced = 0;
         bodyStorage = new ArrayList<>(maxCapacity + 1);
-    }
-
-    public synchronized boolean isEmpty() {
-        return numOfBodies.get() <= 0;
     }
 
     public synchronized Body getBody() throws InterruptedException {

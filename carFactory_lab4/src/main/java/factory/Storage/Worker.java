@@ -35,6 +35,7 @@ public class Worker implements Runnable {
             Car car;
             while (!Thread.currentThread().isInterrupted()) {
                 try {
+                    wait();
                     accessory = accessoriesStorage.getAccessory();
                     body = bodyStorage.getBody();
                     engine = engineStorage.getEngine();

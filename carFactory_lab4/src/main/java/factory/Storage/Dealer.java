@@ -1,6 +1,7 @@
 package factory.Storage;
 
 import factory.Storage.CarWarehouse.Car;
+import factory.Storage.CarWarehouse.CarController;
 import factory.Storage.CarWarehouse.CarStorage;
 
 import java.io.BufferedWriter;
@@ -11,7 +12,7 @@ public class Dealer implements Runnable {
     private final CarStorage carStorage;
     private final boolean isLogging;
 
-    public Dealer(final CarStorage carStorage, final boolean isLogging) {
+    public Dealer(final CarStorage carStorage, final CarController carController, final boolean isLogging) {
         this.carStorage = carStorage;
         this.isLogging = isLogging;
     }
@@ -22,7 +23,7 @@ public class Dealer implements Runnable {
             BufferedWriter bufferedWriter = null;
             if (isLogging) {
                 try {
-                    bufferedWriter = new BufferedWriter(new FileWriter("cars.txt", true));
+                    bufferedWriter = new BufferedWriter(new FileWriter("cars.txt", true)); //logging
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

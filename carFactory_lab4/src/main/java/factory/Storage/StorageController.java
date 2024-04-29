@@ -1,9 +1,11 @@
 package factory.Storage;
 
+import ThreadPool.WorkersThreadPool;
 import factory.Storage.AccessoriesWarehouse.AccessoriesStorage;
 import factory.Storage.AccessoriesWarehouse.AccessoryController;
 import factory.Storage.BodyWarehouse.BodyController;
 import factory.Storage.BodyWarehouse.BodyStorage;
+import factory.Storage.CarWarehouse.CarController;
 import factory.Storage.CarWarehouse.CarStorage;
 import factory.Storage.EngineWarehouse.EngineController;
 import factory.Storage.EngineWarehouse.EngineStorage;
@@ -36,17 +38,20 @@ public class StorageController {
     EngineController engineController;
 
     CarStorage carStorage;
+    CarController carController;
 
-    ExecutorService executorService;
+    WorkersThreadPool workersThreadPool;
 
     public StorageController(final int dealersQuantity, final int accessoryCapacity, final int bodyCapacity, final int engineCapacity, final int carCapacity, final boolean isLogging) {
         this.dealersQuantity = dealersQuantity;
         accessoriesStorage = new AccessoriesStorage(accessoryCapacity);
         bodyStorage = new BodyStorage(bodyCapacity);
         engineStorage = new EngineStorage(engineCapacity);
+        workersThreadPool = new WorkersThreadPool(dealersQuantity);
         carStorage = new CarStorage(carCapacity);
-        threads = new ArrayList<>(dealersQuantity + 1);
         carsCounter = new AtomicInteger(0);
+        carController = new CarController(workersThreadPool, accessoriesStorage, bodyStorage, engineStorage, carStorage, carsCounter);
+        threads = new ArrayList<>(dealersQuantity + 1);
         this.isLogging = isLogging;
     }
 
@@ -89,13 +94,22 @@ public class StorageController {
         threads.add(tmp);
         tmp.start();
 
-        executorService = Executors.newCachedThreadPool();
+        tmp = new Thread(workersThreadPool);
+        tmp.setName("Worker ThreadPool");
+        threads.add(tmp);
+        tmp.start();
+
         for (int i = 0; i < workersQuantity; i++) {
-            executorService.submit(new Worker(accessoriesStorage, bodyStorage, engineStorage, carStorage, carsCounter));
+            workersThreadPool.workerList.add(new Thread(new Worker(accessoriesStorage, bodyStorage, engineStorage, carStorage, carsCounter)));
         }
 
+        tmp = new Thread(carController);
+        tmp.setName("Car Controller");
+        threads.add(tmp);
+        tmp.start();
+
         for (int i = 0; i < dealersQuantity; i++) {
-            tmp = new Thread(new Dealer(carStorage, isLogging));
+            tmp = new Thread(new Dealer(carStorage, carController, isLogging));
             tmp.setName("Dealer " + i);
             threads.add(tmp);
             tmp.start();
@@ -108,7 +122,6 @@ public class StorageController {
         accessoryController.stop();
         bodyController.stop();
         engineController.stop();
-        executorService.shutdown();
         threads.forEach(Thread::interrupt);
     }
 

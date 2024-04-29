@@ -28,7 +28,9 @@ public class CarStorage {
     }
 
     public synchronized boolean isFull() {
-        return numberOfCars.get() == maxCapacity;
+        synchronized (numberOfCars) {
+            return numberOfCars.get() == maxCapacity;
+        }
     }
 
     public synchronized Car getCar() throws InterruptedException {
@@ -38,8 +40,8 @@ public class CarStorage {
         }
         Car car = cars.get(numberOfCars.getAndDecrement() - 1);
         cars.remove(car);
-        notifyAll();
         waitedCars.decrementAndGet();
+        notifyAll();
         return car;
     }
 
@@ -55,7 +57,7 @@ public class CarStorage {
         while (numberOfCars.get() == maxCapacity) {
             wait();
         }
-        numberOfCars.getAndIncrement();
+        numberOfCars.incrementAndGet();
         cars.add(car);
         totalProduced++;
         notifyAll();
