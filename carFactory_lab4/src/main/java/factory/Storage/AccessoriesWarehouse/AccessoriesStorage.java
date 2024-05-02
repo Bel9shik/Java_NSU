@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AccessoriesStorage {
-    private final ArrayList<Accessory> accessories;
+    private final ArrayList<Accessory> accessoryStorage;
 
     private final AtomicInteger numOfAccessories;
     private int totalProduced;
@@ -15,15 +15,15 @@ public class AccessoriesStorage {
         this.maxCapacity = maxCapacity;
         numOfAccessories = new AtomicInteger(0);
         totalProduced = 0;
-        accessories = new ArrayList<>(maxCapacity);
+        accessoryStorage = new ArrayList<>(maxCapacity);
     }
 
     public synchronized Accessory getAccessory() throws InterruptedException {
         while (numOfAccessories.get() == 0) {
             wait();
         }
-        Accessory accessory = accessories.get(numOfAccessories.getAndDecrement() - 1);
-        accessories.remove(accessory);
+        Accessory accessory = accessoryStorage.get(numOfAccessories.getAndDecrement() - 1);
+        accessoryStorage.remove(accessory);
         notifyAll();
         return accessory;
     }
@@ -44,7 +44,7 @@ public class AccessoriesStorage {
         while (numOfAccessories.get() == maxCapacity) {
             wait();
         }
-        accessories.add(accessory);
+        accessoryStorage.add(accessory);
         totalProduced++;
         numOfAccessories.incrementAndGet();
         notifyAll();
