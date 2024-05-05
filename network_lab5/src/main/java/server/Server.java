@@ -7,8 +7,6 @@ import java.util.LinkedList;
 
 public class Server {
 
-    private static Story story;
-
     public static int DEFAULT_PORT = 5000;
 
     static LinkedList<ServerSocketWorker> clientsList = new LinkedList<>();
@@ -20,7 +18,7 @@ public class Server {
 
     private static void startServer() {
         System.out.println("Starting server...");
-        story = new Story();
+        Story story = new Story();
         try (ServerSocket serverSocket = new ServerSocket(DEFAULT_PORT)) {
             while (true) {
                 Socket socket = serverSocket.accept();

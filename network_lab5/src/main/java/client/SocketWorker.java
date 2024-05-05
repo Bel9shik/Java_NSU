@@ -19,11 +19,12 @@ public class SocketWorker {
 
     public SocketWorker(String host, int port) {
         try {
-            tryToConnect(host, port);
             inputUser = new BufferedReader(new InputStreamReader(System.in));
             pressNickname();
+            tryToConnect(host, port);
             new Thread(new ReadMsg()).start();
         } catch (IOException e) {
+            SocketWorker.this.downService();
             e.printStackTrace();
             System.out.println(e);
         }
@@ -49,13 +50,13 @@ public class SocketWorker {
         socket = new Socket(host, port);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
+        out.println("My nickname: " + nickname + "\n");
     }
 
     private void pressNickname() {
         System.out.print("Press your nick: ");
         try {
             nickname = inputUser.readLine();
-            out.println("My nickname: " + nickname + "\n");
         } catch (IOException ignored) {
         }
 
@@ -65,17 +66,18 @@ public class SocketWorker {
     private class ReadMsg implements Runnable {
         @Override
         public void run() {
-            synchronized (this) {
 
                 String str;
                 try {
                     while (true) {
-                        wait(100);
-                        if ((str = in.readLine()) == null) continue;
-                        if (str.equals("stop")) {
-                            SocketWorker.this.downService(); // харакири
-                            break; // выходим из цикла если пришло "stop"
+                        synchronized (this) {
+                            wait(100);
                         }
+                        if ((str = in.readLine()) == null) continue;
+//                        if (str.equals("stop")) {
+//                            SocketWorker.this.downService(); // харакири
+//                            break; // выходим из цикла если пришло "stop"
+//                        }
                         System.out.println(str); // пишем сообщение с сервера на консоль
                         if (clientController != null) {
                             clientController.updateChat(str);
@@ -84,7 +86,6 @@ public class SocketWorker {
                 } catch (IOException | InterruptedException e) {
                     SocketWorker.this.downService();
                 }
-            }
         }
     }
 

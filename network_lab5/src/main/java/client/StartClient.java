@@ -10,7 +10,6 @@ public class StartClient {
 
         new ClientController("localhost", 5000);
         new ClientController("localhost", 5000);
-        new ClientController("localhost", 5000);
 
 
 //        try (Socket clientSocket = new Socket("localhost", 5000)) {

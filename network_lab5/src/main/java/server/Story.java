@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 
 public class Story {
-    private LinkedList<String> storyList;
+    private final LinkedList<String> storyList;
 
     public Story() {
         storyList = new LinkedList<>();
