@@ -1,38 +1,37 @@
 package server;
 
-import client.Client;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
 
 public class Server {
 
+    private static Story story;
+
     public static int DEFAULT_PORT = 5000;
+
+    static LinkedList<ServerSocketWorker> clientsList = new LinkedList<>();
 
 
     public static void main(String[] args) {
-        System.out.println("Starting server...");
-//        startServer();
+        startServer();
     }
 
-//    private static void startServer() {
-//        try (ServerSocket serverSocket = new ServerSocket(DEFAULT_PORT)) {
-//            while (true) {
-//                Socket socket = serverSocket.accept();
-//                System.out.println("New connection from " + socket.getRemoteSocketAddress());
-//                clientsList.add(new SocketWorker(socket));
-//            }
-//        } catch (IOException e) {
-//            System.out.println(e);
-//            e.printStackTrace();
-//        } finally {
-//            System.out.println("Server stopped.");
-//        }
-//    }
+    private static void startServer() {
+        System.out.println("Starting server...");
+        story = new Story();
+        try (ServerSocket serverSocket = new ServerSocket(DEFAULT_PORT)) {
+            while (true) {
+                Socket socket = serverSocket.accept();
+                clientsList.add(new ServerSocketWorker(socket, story));
+            }
+        } catch (IOException e) {
+            System.out.println(e);
+            e.printStackTrace();
+        } finally {
+            System.out.println("Server stopped.");
+        }
+    }
 
 }

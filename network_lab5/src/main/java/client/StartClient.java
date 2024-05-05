@@ -1,5 +1,6 @@
 package client;
 
+import client.View.ControllerView;
 import client.View.CreateChatFrame;
 
 public class StartClient {
@@ -7,10 +8,9 @@ public class StartClient {
     public static void main(String[] args) {
         System.out.println("Hello World!");
 
-        CreateChatFrame frame = new CreateChatFrame();
-
-
-
+        new ClientController("localhost", 5000);
+        new ClientController("localhost", 5000);
+        new ClientController("localhost", 5000);
 
 
 //        try (Socket clientSocket = new Socket("localhost", 5000)) {
@@ -34,4 +34,5 @@ public class StartClient {
 //            System.out.println(e);
 //        }
 //    }
+    }
 }
