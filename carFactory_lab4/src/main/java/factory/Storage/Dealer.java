@@ -6,8 +6,6 @@ import factory.Storage.CarWarehouse.CarStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-
 
 public class Dealer implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Dealer.class);
