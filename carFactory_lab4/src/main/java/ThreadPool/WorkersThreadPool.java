@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class WorkersThreadPool{
-    BlockingQueue<RunnableThread> workQueue;
+    BlockingQueue<Thread> workQueue;
     BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
 
     AtomicInteger taskCount = new AtomicInteger(0);
@@ -15,10 +15,9 @@ public class WorkersThreadPool{
         workQueue = new ArrayBlockingQueue<>(workersQuantity);
 
         for (int i = 0; i < workersQuantity; i++) {
-            workQueue.offer(new RunnableThread(taskQueue, taskCount));
+            workQueue.add(Thread.ofPlatform().start(new RunnableThread(taskQueue, taskCount)));
         }
 
-        workQueue.forEach((x) -> new Thread(x).start());
     }
 
 
@@ -28,10 +27,7 @@ public class WorkersThreadPool{
     }
 
     public void shutdown() {
-        workQueue.forEach(RunnableThread::shutdown);
+        workQueue.forEach(Thread::interrupt);
     }
 
-    public int getTaskCount() {
-        return taskCount.get();
-    }
 }
