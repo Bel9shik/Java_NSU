@@ -6,21 +6,28 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ServerSocketWorker extends Thread {
-    private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+public class ServerSocketWorker implements Runnable {
+    private final Socket socket;
+    private final BufferedReader in;
+    private final PrintWriter out;
+    private final Story story;
+    private final Thread curThread;
     private String nickname;
-    private Story story;
 
     public ServerSocketWorker(Socket socket, Story story) throws IOException {
         this.socket = socket;
         this.story = story;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
-        this.start();
+        curThread = new Thread(this);
+        curThread.start();
         story.showStory(out);
     }
+
+    public synchronized String getNickname() {
+        return nickname;
+    }
+
 
     @Override
     public void run() {
@@ -29,18 +36,31 @@ public class ServerSocketWorker extends Thread {
         try {
             message = in.readLine();
             nickname = message.replaceFirst("My nickname: ", "");
-            System.out.println("nickname news connection: " + nickname);
+            for (ServerSocketWorker socketWorker : Server.clientsList) {
+                socketWorker.send(nickname + " connected");
+            }
             while (true) {
                 synchronized (this) {
                     wait(100);
                 }
                 message = in.readLine();
                 if (message == null) continue;
-                if (message.equals("bye")) {
+                else if (message.equals("Server, i go out")) {
+                    synchronized (Server.clientsList) {
+                        for (ServerSocketWorker socketWorker : Server.clientsList) {
+                            socketWorker.send(nickname + " disconnected");
+                        }
+                    }
                     this.downService();
                     break;
+                } else if (message.contains("/list")) {
+                    StringBuilder List = new StringBuilder("List of participants:\n");
+                    for (ServerSocketWorker socketWorker : Server.clientsList) {
+                        List.append(socketWorker.getNickname()).append("\n");
+                    }
+                    this.send(List.toString());
+                    continue;
                 }
-                System.out.println(message);
                 story.addStory(message);
                 for (ServerSocketWorker socketWorker : Server.clientsList) {
                     socketWorker.send(message);
@@ -58,17 +78,12 @@ public class ServerSocketWorker extends Thread {
 
     private void downService() {
         try {
-            if (!socket.isClosed()) {
-                socket.close();
-                in.close();
-                out.close();
-                for (ServerSocketWorker vr : Server.clientsList) {
-                    if (vr.equals(this)) {
-                        vr.interrupt();
-                        Server.clientsList.remove(this);
-                    }
-                }
-            }
+            socket.close();
+            in.close();
+            out.close();
+            Server.clientsList.remove(this);
+            curThread.interrupt();
+            System.out.println("Socket closed");
         } catch (IOException ignored) {
         }
     }

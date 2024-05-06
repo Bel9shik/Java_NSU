@@ -3,8 +3,8 @@ package client;
 import client.View.ControllerView;
 
 public class ClientController {
-    private ControllerView controllerView;
-    private SocketWorker socketWorker;
+    private final ControllerView controllerView;
+    private final SocketWorker socketWorker;
 
     public ClientController(String host, int port) {
         socketWorker = new SocketWorker(host, port);
@@ -17,6 +17,10 @@ public class ClientController {
         if (!message.isEmpty()) {
             socketWorker.sendMessage(message);
         }
+    }
+
+    public void downService() {
+        socketWorker.downService();
     }
 
     public void connectionLost () {

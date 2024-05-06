@@ -18,7 +18,10 @@ public class ControllerView {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-
+                if (clientController != null) {
+                    System.out.println("test");
+                    clientController.downService();
+                }
             }
         });
 

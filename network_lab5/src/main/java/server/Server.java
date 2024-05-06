@@ -9,7 +9,7 @@ public class Server {
 
     public static int DEFAULT_PORT = 5000;
 
-    static LinkedList<ServerSocketWorker> clientsList = new LinkedList<>();
+    static final LinkedList<ServerSocketWorker> clientsList = new LinkedList<>();
 
 
     public static void main(String[] args) {
@@ -25,8 +25,8 @@ public class Server {
                 clientsList.add(new ServerSocketWorker(socket, story));
             }
         } catch (IOException e) {
-            System.out.println(e);
             e.printStackTrace();
+            System.out.println(e);
         } finally {
             System.out.println("Server stopped.");
         }

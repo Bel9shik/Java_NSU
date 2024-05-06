@@ -41,6 +41,7 @@ public class SocketWorker {
         if (message.equals("stop")) {
             out.println("stop");
             SocketWorker.this.downService(); // харакири
+
         } else {
             out.println("(" + dtime + ") " + nickname + ": " + message); // отправляем на сервер
         }
@@ -67,36 +68,34 @@ public class SocketWorker {
         @Override
         public void run() {
 
-                String str;
-                try {
-                    while (true) {
-                        synchronized (this) {
-                            wait(100);
-                        }
-                        if ((str = in.readLine()) == null) continue;
-//                        if (str.equals("stop")) {
-//                            SocketWorker.this.downService(); // харакири
-//                            break; // выходим из цикла если пришло "stop"
-//                        }
-                        System.out.println(str); // пишем сообщение с сервера на консоль
-                        if (clientController != null) {
-                            clientController.updateChat(str);
-                        }
+            String str;
+            try {
+                while (!Thread.currentThread().isInterrupted()) {
+                    synchronized (this) {
+                        wait(100);
                     }
-                } catch (IOException | InterruptedException e) {
-                    SocketWorker.this.downService();
+                    if ((str = in.readLine()) == null) continue;
+                    if (clientController != null) {
+                        clientController.updateChat(str);
+                    }
                 }
+            } catch (IOException | InterruptedException e) {
+                SocketWorker.this.downService();
+            }
         }
     }
 
-    private void downService() {
+    public void downService() {
         try {
+            out.println("Server, i go out");
             if (!socket.isClosed()) {
                 socket.close();
             }
             out.close();
             in.close();
         } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e);
         }
     }
 }
