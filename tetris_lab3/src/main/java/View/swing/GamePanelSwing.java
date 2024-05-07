@@ -1,4 +1,4 @@
-package View;
+package View.swing;
 
 import Controller.KeyHandler;
 import Model.Block;
@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class GamePanel extends JPanel {
+public class GamePanelSwing extends JPanel {
 
     public static final int WINDOW_WIDTH = 1280;
     public static final int WINDOW_HEIGHT = 720;
@@ -25,7 +25,7 @@ public class GamePanel extends JPanel {
 
     ModelController model;
 
-    public GamePanel(ModelController model) {
+    public GamePanelSwing(ModelController model) {
 
         this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -48,9 +48,8 @@ public class GamePanel extends JPanel {
         g2.fillRect(block.coords.getX() + block.margin, block.coords.getY() + block.margin, Block.WIDTH - (block.margin * 2), Block.HEIGHT - (block.margin * 2));
     }
 
-    private void drawFigure (Graphics2D g2, ArrayList<Block> figure) { //мб сделать просто лист?
+    private void drawFigure (Graphics2D g2, ArrayList<Block> figure) {
         for (Block block : figure) {
-            g2.setColor(block.color);
             drawBlock(g2, block);
         }
     }

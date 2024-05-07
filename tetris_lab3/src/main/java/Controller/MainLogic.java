@@ -1,26 +1,27 @@
 package Controller;
 
 import Model.ModelController;
-import View.CreateFrame;
-import View.GamePanel;
+import View.FX.GamePanelFX;
+import View.swing.CreateFrameSwing;
+import View.swing.GamePanelSwing;
 
 public final class MainLogic implements Runnable {
 
-    private final int FPS = 60;
+    public static final int FPS = 60;
 
     Thread gameThread;
     ModelController model;
-    GamePanel gamePanel;
-    CreateFrame mainFrame;
+    GamePanelSwing gamePanelSwing;
+    CreateFrameSwing frameSwing;
     FigureController figureController;
 
     public MainLogic(String windowTitle) {
         model = new ModelController();
         figureController = new FigureController(model);
-        gamePanel = new GamePanel(model);
-        mainFrame = new CreateFrame(windowTitle, gamePanel);
+        gamePanelSwing = new GamePanelSwing(model);
+        frameSwing = new CreateFrameSwing(windowTitle, gamePanelSwing);
+        frameSwing.showFrame();
     }
-
 
     public void launchGame() {
         gameThread = new Thread(this);
@@ -42,7 +43,7 @@ public final class MainLogic implements Runnable {
 
             if (delta >= 1) {
                 update();
-                gamePanel.repaint();
+                gamePanelSwing.repaint();
                 delta--;
             }
         }

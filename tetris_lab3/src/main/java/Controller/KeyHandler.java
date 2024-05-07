@@ -2,7 +2,6 @@ package Controller;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.security.Key;
 
 public final class KeyHandler implements KeyListener {
 

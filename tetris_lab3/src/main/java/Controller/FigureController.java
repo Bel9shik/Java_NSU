@@ -2,12 +2,12 @@ package Controller;
 
 import Model.Block;
 import Model.ModelController;
-import View.GamePanel;
+import View.swing.GamePanelSwing;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static View.GamePanel.*;
+import static View.swing.GamePanelSwing.*;
 
 public final class FigureController {
     private final FigureFactory figureFactory;
@@ -84,7 +84,7 @@ public final class FigureController {
             if (x == RIGHT_X) {
 
                 // if line filled blocks
-                if (blockCount == GamePanel.PLAY_WIDTH / Block.WIDTH) {
+                if (blockCount == GamePanelSwing.PLAY_WIDTH / Block.WIDTH) {
                     linesCount++;
                     for (int i = model.staticBlocks.size() - 1; i > -1; i--) {
                         if (model.staticBlocks.get(i).coords.getY() == y) {
@@ -191,7 +191,7 @@ public final class FigureController {
 
         //check left wall
         for (Block block : model.currentFigure) {
-            if (block.coords.getX() == GamePanel.LEFT_X) {
+            if (block.coords.getX() == GamePanelSwing.LEFT_X) {
                 leftCollision = true;
                 break;
             }
@@ -199,7 +199,7 @@ public final class FigureController {
 
         //check right wall
         for (Block block : model.currentFigure) {
-            if (block.coords.getX() + Block.WIDTH == GamePanel.RIGHT_X) {
+            if (block.coords.getX() + Block.WIDTH == GamePanelSwing.RIGHT_X) {
                 rightCollision = true;
                 break;
             }
@@ -207,7 +207,7 @@ public final class FigureController {
 
         //check bottom collision
         for (Block block : model.currentFigure) {
-            if (block.coords.getY() + Block.HEIGHT == GamePanel.BOTTOM_Y) {
+            if (block.coords.getY() + Block.HEIGHT == GamePanelSwing.BOTTOM_Y) {
                 bottomCollision = true;
                 break;
             }
@@ -225,8 +225,8 @@ public final class FigureController {
 
         for (Block tempBlock : tempBlocks) {
             //check left wall
-            if (tempBlock.coords.getX() < GamePanel.LEFT_X) {
-                extremeCoordinateLeftX = GamePanel.LEFT_X;
+            if (tempBlock.coords.getX() < GamePanelSwing.LEFT_X) {
+                extremeCoordinateLeftX = GamePanelSwing.LEFT_X;
                 leftCollision = true;
                 if (extremeCoordinateLeftX > tempBlock.coords.getX()) {
                     extremeCoordinateLeftX = tempBlock.coords.getX();
@@ -234,8 +234,8 @@ public final class FigureController {
             }
 
             //check right wall
-            if (tempBlock.coords.getX() + Block.WIDTH > GamePanel.RIGHT_X) {
-                extremeCoordinateRightX = GamePanel.RIGHT_X;
+            if (tempBlock.coords.getX() + Block.WIDTH > GamePanelSwing.RIGHT_X) {
+                extremeCoordinateRightX = GamePanelSwing.RIGHT_X;
                 rightCollision = true;
                 if (extremeCoordinateRightX < tempBlock.coords.getX()) {
                     extremeCoordinateRightX = tempBlock.coords.getX();
@@ -243,7 +243,7 @@ public final class FigureController {
             }
 
             //check bottom collision
-            if (tempBlock.coords.getY() + Block.HEIGHT > GamePanel.BOTTOM_Y) {
+            if (tempBlock.coords.getY() + Block.HEIGHT > GamePanelSwing.BOTTOM_Y) {
                 bottomCollision = true;
             }
         }
@@ -288,7 +288,7 @@ public final class FigureController {
 
         if (leftCollision) {
 
-            while ((GamePanel.LEFT_X - extremeCoordinateLeftX) != 0) {
+            while ((GamePanelSwing.LEFT_X - extremeCoordinateLeftX) != 0) {
                 extremeCoordinateLeftX += Block.WIDTH;
                 for (int i = 0; i < tempBlocks.size(); i++) {
                     tempBlocks.get(i).coords.setX(tempBlocks.get(i).coords.getX() + Block.WIDTH);
@@ -298,7 +298,7 @@ public final class FigureController {
 
         if (rightCollision) {
 
-            while ((GamePanel.RIGHT_X - (extremeCoordinateRightX + Block.WIDTH)) != 0) {
+            while ((GamePanelSwing.RIGHT_X - (extremeCoordinateRightX + Block.WIDTH)) != 0) {
                 extremeCoordinateRightX -= Block.WIDTH;
                 for (int i = 0; i < tempBlocks.size(); i++) {
                     tempBlocks.get(i).coords.setX(tempBlocks.get(i).coords.getX() - Block.WIDTH);

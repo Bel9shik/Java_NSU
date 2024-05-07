@@ -1,20 +1,23 @@
-package View;
+package View.swing;
 
 import javax.swing.*;
 
-public class CreateFrame extends JFrame {
-    GamePanel gamePanel;
+public class CreateFrameSwing extends JFrame {
+    GamePanelSwing gamePanelSwing;
     private JFrame mainFrame;
 
-    public CreateFrame(String windowTitle, GamePanel gamePanel) {
+    public CreateFrameSwing(String windowTitle, GamePanelSwing gamePanelSwing) {
         mainFrame = new JFrame(windowTitle);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setResizable(false);
 
-        this.gamePanel = gamePanel;
-        mainFrame.add(gamePanel);
+        this.gamePanelSwing = gamePanelSwing;
+        mainFrame.add(gamePanelSwing);
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
+    }
+
+    public void showFrame() {
         mainFrame.setVisible(true);
     }
 }
