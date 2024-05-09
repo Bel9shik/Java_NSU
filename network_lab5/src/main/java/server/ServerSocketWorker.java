@@ -1,9 +1,8 @@
 package server;
 
-import messages.Command;
-import messages.Message;
-import messages.TextMessage;
-import org.w3c.dom.Text;
+import client.event.messages.Command;
+import client.event.messages.Message;
+import client.event.messages.TextMessage;
 
 import java.io.*;
 import java.net.Socket;
@@ -71,6 +70,7 @@ public class ServerSocketWorker implements Runnable {
                         for (ServerSocketWorker socketWorker : Server.clientsList) {
                             list.add(socketWorker.getNickname() + "\n");
                         }
+                        System.out.println(list);
                         this.send(new TextMessage(list));
                         continue;
                     }

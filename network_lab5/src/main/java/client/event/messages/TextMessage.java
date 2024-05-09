@@ -1,4 +1,4 @@
-package messages;
+package client.event.messages;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,14 +12,6 @@ public class TextMessage extends Message implements Serializable {
 
     public TextMessage(String text){
         singleMessage = text;
-    }
-
-    public List<String> getText() {
-        return text;
-    }
-
-    public String getSingleMessage() {
-        return singleMessage;
     }
 
     @Override

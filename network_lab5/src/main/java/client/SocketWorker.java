@@ -1,19 +1,20 @@
 package client;
 
-import messages.Command;
-import messages.Message;
-import messages.TextMessage;
+import client.event.clientEvents.ConnectionLost;
+import client.event.clientEvents.UpdateChat;
+import client.event.messages.Command;
+import client.event.messages.Message;
+import client.event.messages.TextMessage;
 
 import java.io.*;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class SocketWorker {
+public class SocketWorker extends Observable {
     private Socket socketToServer;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private ClientController clientController;
 
     private BufferedReader inputUser; // поток чтения с консоли
     private String nickname; // имя клиента
@@ -31,10 +32,6 @@ public class SocketWorker {
         }
     }
 
-    public void setClientController(ClientController controller) {
-        this.clientController = controller;
-    }
-
     public void sendMessage(Message message) throws IOException {
         Date time = new Date(); // текущая дата
         SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
@@ -44,7 +41,7 @@ public class SocketWorker {
                 out.writeObject(message);
                 out.flush();
                 downService(); // харакири
-                clientController.connectionLost();
+                notifyObservers(new ConnectionLost());
             } else if (((Command) message).getCommand().equals("/list")) {
                 out.writeObject(message);
                 out.flush();
@@ -80,8 +77,8 @@ public class SocketWorker {
                         wait(100);
                     }
                     if ((obj = in.readObject()) == null) continue;
-                    if (clientController != null && obj instanceof TextMessage) {
-                        clientController.updateChat((TextMessage) obj);
+                    if (obj instanceof TextMessage) {
+                        notifyObservers(new UpdateChat(obj.toString()));
                     }
                 }
             } catch (IOException | InterruptedException e) {

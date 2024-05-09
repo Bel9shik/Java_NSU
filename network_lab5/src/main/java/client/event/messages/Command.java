@@ -1,4 +1,4 @@
-package messages;
+package client.event.messages;
 
 import java.io.Serializable;
 

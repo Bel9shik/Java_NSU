@@ -1,31 +1,29 @@
 package client.view;
 
 import client.ClientController;
-import messages.Command;
-import messages.Message;
-import messages.TextMessage;
+import client.Observable;
+import client.event.clientEvents.DownService;
+import client.event.messages.Command;
+import client.event.messages.TextMessage;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 
-public class ControllerView {
+public class ControllerView extends Observable {
     private JFrame frame;
     private JTextArea textArea;
     private JTextField messageField;
     private JButton sendButton;
-    private ClientController clientController;
+//    private ClientController clientController;
 
     public ControllerView() {
         frame = new CreateChatFrame();
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (clientController != null) {
-                    System.out.println("test");
-                    clientController.downService();
-                }
+                    notifyObservers(new DownService());
             }
         });
 
@@ -38,9 +36,9 @@ public class ControllerView {
         frame.setVisible(true);
     }
 
-    public void setClientController(ClientController clientController) {
-        this.clientController = clientController;
-    }
+//    public void setClientController(ClientController clientController) {
+//        this.clientController = clientController;
+//    }
 
     private class ChatPanel extends JPanel {
         public ChatPanel() {
@@ -54,15 +52,10 @@ public class ControllerView {
     }
 
     private void sendMsg(String msg) {
-        try {
-            if (msg.equals("/exit") || msg.equals("/list")) {
-                clientController.sendMessage(new Command(msg));
-            } else {
-                clientController.sendMessage(new TextMessage(msg));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println(e);
+        if (msg.equals("/exit") || msg.equals("/list")) {
+            notifyObservers(new Command(msg));
+        } else {
+            notifyObservers(new TextMessage(msg));
         }
         messageField.setText("");
     }
@@ -95,6 +88,7 @@ public class ControllerView {
         }
 
     }
+
     public void connectionLost() {
         JOptionPane.showMessageDialog(frame, "Connection lost.");
         frame.setVisible(false);

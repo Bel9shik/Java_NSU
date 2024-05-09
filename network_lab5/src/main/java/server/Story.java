@@ -1,10 +1,9 @@
 package server;
 
-import messages.Message;
+import client.event.messages.Message;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.util.LinkedList;
 
 public class Story {
