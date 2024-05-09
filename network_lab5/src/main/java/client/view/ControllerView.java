@@ -1,10 +1,14 @@
-package client.View;
+package client.view;
 
 import client.ClientController;
+import messages.Command;
+import messages.Message;
+import messages.TextMessage;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 public class ControllerView {
     private JFrame frame;
@@ -50,7 +54,16 @@ public class ControllerView {
     }
 
     private void sendMsg(String msg) {
-        clientController.sendMessage(msg);
+        try {
+            if (msg.equals("/exit") || msg.equals("/list")) {
+                clientController.sendMessage(new Command(msg));
+            } else {
+                clientController.sendMessage(new TextMessage(msg));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e);
+        }
         messageField.setText("");
     }
 
@@ -84,6 +97,7 @@ public class ControllerView {
     }
     public void connectionLost() {
         JOptionPane.showMessageDialog(frame, "Connection lost.");
+        frame.setVisible(false);
     }
 
     public void updateChat(String message) {

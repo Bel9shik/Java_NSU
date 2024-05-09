@@ -1,6 +1,10 @@
 package client;
 
-import client.View.ControllerView;
+import client.view.ControllerView;
+import messages.Message;
+import messages.TextMessage;
+
+import java.io.IOException;
 
 public class ClientController {
     private final ControllerView controllerView;
@@ -13,24 +17,20 @@ public class ClientController {
         controllerView.setClientController(this);
     }
 
-    public void sendMessage(String message) {
-        if (!message.isEmpty()) {
-            socketWorker.sendMessage(message);
-        }
+    public void sendMessage(Message message) throws IOException {
+        socketWorker.sendMessage(message);
     }
 
     public void downService() {
         socketWorker.downService();
     }
 
-    public void connectionLost () {
+    public void connectionLost() {
         controllerView.connectionLost();
     }
 
-    public void updateChat (String message) {
-        if (!message.isEmpty()) {
-            controllerView.updateChat(message + "\n");
-        }
+    public void updateChat(TextMessage message) {
+        controllerView.updateChat(message + "\n");
     }
 
 }

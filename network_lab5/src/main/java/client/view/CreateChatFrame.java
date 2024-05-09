@@ -1,9 +1,7 @@
-package client.View;
+package client.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class CreateChatFrame extends JFrame {
 

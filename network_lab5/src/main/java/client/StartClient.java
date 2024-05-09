@@ -1,8 +1,5 @@
 package client;
 
-import client.View.ControllerView;
-import client.View.CreateChatFrame;
-
 public class StartClient {
 
     public static void main(String[] args) {

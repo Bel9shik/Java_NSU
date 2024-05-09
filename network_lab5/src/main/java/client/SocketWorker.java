@@ -1,17 +1,18 @@
 package client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import messages.Command;
+import messages.Message;
+import messages.TextMessage;
+
+import java.io.*;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class SocketWorker {
-    private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    private Socket socketToServer;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
     private ClientController clientController;
 
     private BufferedReader inputUser; // поток чтения с консоли
@@ -24,9 +25,9 @@ public class SocketWorker {
             tryToConnect(host, port);
             new Thread(new ReadMsg()).start();
         } catch (IOException e) {
-            SocketWorker.this.downService();
-            e.printStackTrace();
             System.out.println(e);
+            e.printStackTrace();
+            SocketWorker.this.downService();
         }
     }
 
@@ -34,33 +35,37 @@ public class SocketWorker {
         this.clientController = controller;
     }
 
-    public void sendMessage(String message) {
+    public void sendMessage(Message message) throws IOException {
         Date time = new Date(); // текущая дата
         SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
         String dtime = dt1.format(time); // время
-        if (message.equals("stop")) {
-            out.println("stop");
-            SocketWorker.this.downService(); // харакири
-
-        } else {
-            out.println("(" + dtime + ") " + nickname + ": " + message); // отправляем на сервер
+        if (message instanceof Command) {
+            if (((Command) message).getCommand().equals("/exit")) {
+                out.writeObject(message);
+                out.flush();
+                downService(); // харакири
+                clientController.connectionLost();
+            } else if (((Command) message).getCommand().equals("/list")) {
+                out.writeObject(message);
+                out.flush();
+            }
+        } else if (message instanceof TextMessage) {
+            out.writeObject(new TextMessage("(" + dtime + ") " + nickname + ": " + message)); // отправляем на сервер
+            out.flush();
         }
     }
 
     private void tryToConnect(String host, int port) throws IOException {
-        socket = new Socket(host, port);
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out = new PrintWriter(socket.getOutputStream(), true);
-        out.println("My nickname: " + nickname + "\n");
+        socketToServer = new Socket(host, port);
+        this.out = new ObjectOutputStream(socketToServer.getOutputStream());
+        this.in = new ObjectInputStream(socketToServer.getInputStream());
+        out.writeObject(new Command("/nickname: " + nickname));
+        out.flush();
     }
 
-    private void pressNickname() {
+    private void pressNickname() throws IOException {
         System.out.print("Press your nick: ");
-        try {
-            nickname = inputUser.readLine();
-        } catch (IOException ignored) {
-        }
-
+        nickname = inputUser.readLine();
     }
 
     // нить чтения сообщений с сервера
@@ -68,31 +73,34 @@ public class SocketWorker {
         @Override
         public void run() {
 
-            String str;
+            Object obj;
             try {
                 while (!Thread.currentThread().isInterrupted()) {
                     synchronized (this) {
                         wait(100);
                     }
-                    if ((str = in.readLine()) == null) continue;
-                    if (clientController != null) {
-                        clientController.updateChat(str);
+                    if ((obj = in.readObject()) == null) continue;
+                    if (clientController != null && obj instanceof TextMessage) {
+                        clientController.updateChat((TextMessage) obj);
                     }
                 }
             } catch (IOException | InterruptedException e) {
                 SocketWorker.this.downService();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                System.out.println(e);
             }
         }
     }
 
     public void downService() {
         try {
-            out.println("Server, i go out");
-            if (!socket.isClosed()) {
-                socket.close();
+            if (!socketToServer.isClosed()) {
+                socketToServer.close();
             }
             out.close();
             in.close();
+            System.out.println("user logged out");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e);
