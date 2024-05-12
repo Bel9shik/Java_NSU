@@ -97,7 +97,6 @@ public class SocketWorker extends Observable {
             }
             out.close();
             in.close();
-            System.out.println("user logged out");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e);

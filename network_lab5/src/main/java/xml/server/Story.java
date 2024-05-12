@@ -1,30 +1,26 @@
 package xml.server;
 
-import xml.client.event.messages.Message;
+import org.w3c.dom.Document;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 
 public class Story {
-    private final LinkedList<Message> storyList;
+    private final LinkedList<Document> storyList;
 
     public Story() {
         storyList = new LinkedList<>();
     }
 
-    public synchronized void addStory(Message story) {
+    public synchronized void addStory(Document document) {
         if (storyList.size() >= 10) {
             storyList.removeFirst();
         }
-        storyList.add(story);
+        storyList.add(document);
     }
 
-    public synchronized void showStory(ObjectOutputStream out) throws IOException {
+    public LinkedList<Document> getStory() {
         if (!storyList.isEmpty()) {
-            for (Message story : storyList) {
-                out.writeObject(story);
-            }
-        }
+            return storyList;
+        } else return null;
     }
 }
