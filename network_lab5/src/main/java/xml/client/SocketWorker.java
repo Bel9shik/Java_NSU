@@ -92,10 +92,7 @@ public class SocketWorker extends Observable {
         return doc;
     }
 
-    public void sendMessage(Message message) throws IOException {
-        Date time = new Date(); // текущая дата
-        SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
-        String dtime = dt1.format(time); // время
+    public void sendMessage(Message message) throws IOException { // связка между клиентом и сервером
 
         Document doc;
         if (message instanceof Command) {
@@ -109,8 +106,8 @@ public class SocketWorker extends Observable {
                 send(doc);
             }
         } else if (message instanceof TextMessage) {
-            doc = createCommandDocument("message", message.toString()); // отправляем на сервер
-            send(doc);
+            doc = createCommandDocument("message", message.toString());
+            send(doc); // отправляем на сервер
         }
     }
 
@@ -246,7 +243,6 @@ public class SocketWorker extends Observable {
             }
             out.close();
             in.close();
-            System.out.println("user logged out");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e);
