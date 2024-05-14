@@ -53,6 +53,7 @@ public class ServerSocketWorker implements Runnable {
             for (ServerSocketWorker socketWorker : Server.clientsList) {
                 socketWorker.send(new TextMessage(nickname + " connected"));
             }
+
             while (true) {
                 synchronized (this) {
                     wait(100);
@@ -104,7 +105,7 @@ public class ServerSocketWorker implements Runnable {
         }
     }
 
-    private synchronized void send(Message message) throws IOException {
+    private synchronized void send(Message message) throws IOException { //ty-catch
         out.writeObject(message);
         out.flush();
     }
