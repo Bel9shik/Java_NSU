@@ -7,14 +7,23 @@
                 <Pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>
         </File>
+        <File name="serverLogERR" fileName="serverLogERR.log" append="false">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+        </File>
 
     </Appenders>
 
     <Loggers>
 
         <Root level="info">
-            <AppenderRef ref="serverLogINFO" level="info"/>
+            <AppenderRef ref="serverLogINFO"/>
+            <AppenderRef ref="serverLogERR"/>
         </Root>
+        <Logger name="ErrorLogger" level="error" additivity="false">
+            <AppenderRef ref="serverLogERR"/>
+        </Logger>
 
     </Loggers>
 

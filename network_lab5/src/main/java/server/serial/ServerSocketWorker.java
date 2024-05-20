@@ -68,9 +68,6 @@ public class ServerSocketWorker extends server.ServerSocketWorker implements Run
             }
 
             while (true) {
-                synchronized (this) {
-                    wait(100);
-                }
                 message = in.readObject();
                 if (message == null) continue;
                 else if (message instanceof Command) {
@@ -110,11 +107,10 @@ public class ServerSocketWorker extends server.ServerSocketWorker implements Run
                 }
 
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             this.downService();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            System.out.println(e);
+            logger.error(e.getMessage());
         }
     }
 
@@ -131,8 +127,6 @@ public class ServerSocketWorker extends server.ServerSocketWorker implements Run
     private void downService() {
         try {
             socketToClient.close();
-            in.close();
-            out.close();
             StartServer.clientsList.remove(this);
             curThread.interrupt();
             System.out.println("Socket closed");

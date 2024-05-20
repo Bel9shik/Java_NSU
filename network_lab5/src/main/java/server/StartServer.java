@@ -1,5 +1,8 @@
 package server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +18,8 @@ public class StartServer {
     public static final LinkedList<ServerSocketWorker> clientsList = new LinkedList<>();
 
     public static AtomicInteger uniqueSessionID = new AtomicInteger(0);
+
+    private static Logger logger = LoggerFactory.getLogger(StartServer.class);
 
     public static void main(String[] args) {
         startServer();
@@ -42,8 +47,7 @@ public class StartServer {
                 }
             }
         } catch (IOException | ParserConfigurationException e) {
-            e.printStackTrace();
-            System.out.println(e);
+            logger.error(e.getMessage());
         } finally {
             System.out.println("Server stopped.");
         }

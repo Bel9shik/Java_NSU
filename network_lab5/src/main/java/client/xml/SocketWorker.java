@@ -229,16 +229,13 @@ public class SocketWorker extends client.SocketWorker {
             Document responseDoc;
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    synchronized (this) {
-                        wait(100);
-                    }
                     responseDoc = readMessage();
                     toDoFromDocument(responseDoc);
                 }
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 SocketWorker.this.downService();
             } catch (SAXException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e);//logger and xml error doc
             }
         }
     }
