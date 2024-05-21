@@ -125,34 +125,39 @@ public class ServerSocketWorker extends server.ServerSocketWorker implements Run
     private Document createEventDocument(String type, String message, String nickname) {
         Document eventDocument = documentBuilder.newDocument();
         Element eventElement = eventDocument.createElement("event");
-        if (type.equals("message")) {
-            eventElement.setAttribute("name", "message");
-            Element messageElement = eventDocument.createElement("message");
-            messageElement.setTextContent(message);
-            Element nameElement = eventDocument.createElement("name");
-            nameElement.setTextContent(nickname);
+        switch (type) {
+            case "message" -> {
+                eventElement.setAttribute("name", "message");
+                Element messageElement = eventDocument.createElement("message");
+                messageElement.setTextContent(message);
+                Element nameElement = eventDocument.createElement("name");
+                nameElement.setTextContent(nickname);
 
-            eventElement.appendChild(messageElement);
-            eventElement.appendChild(nameElement);
+                eventElement.appendChild(messageElement);
+                eventElement.appendChild(nameElement);
 
-            eventDocument.appendChild(eventElement);
-            return eventDocument;
-        } else if (type.equals("userLogin")) {
-            eventElement.setAttribute("name", "userLogin");
-            Element nicknameElement = eventDocument.createElement("name");
-            nicknameElement.setTextContent(nickname);
-            eventElement.appendChild(nicknameElement);
-            eventDocument.appendChild(eventElement);
-            return eventDocument;
-        } else if (type.equals("userLogout")) {
-            eventElement.setAttribute("name", "userLogout");
-            Element nicknameElement = eventDocument.createElement("name");
-            nicknameElement.setTextContent(nickname);
-            eventElement.appendChild(nicknameElement);
-            eventDocument.appendChild(eventElement);
-            return eventDocument;
-        } else {
-            return null;
+                eventDocument.appendChild(eventElement);
+                return eventDocument;
+            }
+            case "userLogin" -> {
+                eventElement.setAttribute("name", "userLogin");
+                Element nicknameElement = eventDocument.createElement("name");
+                nicknameElement.setTextContent(nickname);
+                eventElement.appendChild(nicknameElement);
+                eventDocument.appendChild(eventElement);
+                return eventDocument;
+            }
+            case "userLogout" -> {
+                eventElement.setAttribute("name", "userLogout");
+                Element nicknameElement = eventDocument.createElement("name");
+                nicknameElement.setTextContent(nickname);
+                eventElement.appendChild(nicknameElement);
+                eventDocument.appendChild(eventElement);
+                return eventDocument;
+            }
+            default -> {
+                return null;
+            }
         }
     }
 
