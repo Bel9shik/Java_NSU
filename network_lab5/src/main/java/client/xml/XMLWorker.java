@@ -1,5 +1,6 @@
 package client.xml;
 
+import client.SocketWorker;
 import client.events.clientEvents.ConnectionLost;
 import client.events.clientEvents.UpdateChat;
 import client.events.messages.Command;
@@ -25,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
-public class SocketWorker extends client.SocketWorker {
+public class XMLWorker extends SocketWorker {
     private Socket socketToServer;
     private InputStream in;
     private OutputStream out;
@@ -35,7 +36,7 @@ public class SocketWorker extends client.SocketWorker {
     private DocumentBuilder documentBuilder;
     private long UNIQUE_SESSION_ID;
 
-    public SocketWorker(String host, int port) {
+    public XMLWorker(String host, int port) {
         try {
             documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             inputUser = new BufferedReader(new InputStreamReader(System.in));
@@ -49,7 +50,7 @@ public class SocketWorker extends client.SocketWorker {
         } catch (IOException | ParserConfigurationException | SAXException e) {
             System.out.println(e);
             e.printStackTrace();
-            SocketWorker.this.downService();
+            XMLWorker.this.downService();
         }
     }
 
@@ -233,7 +234,7 @@ public class SocketWorker extends client.SocketWorker {
                     toDoFromDocument(responseDoc);
                 }
             } catch (IOException e) {
-                SocketWorker.this.downService();
+                XMLWorker.this.downService();
             } catch (SAXException e) {
                 throw new RuntimeException(e);//logger and xml error doc
             }

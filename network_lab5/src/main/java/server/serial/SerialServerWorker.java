@@ -13,7 +13,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class ServerSocketWorker extends server.ServerSocketWorker implements Runnable {
+public class SerialServerWorker extends server.ServerSocketWorker implements Runnable {
     private final Socket socketToClient;
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
@@ -22,9 +22,9 @@ public class ServerSocketWorker extends server.ServerSocketWorker implements Run
     private String nickname;
     private final boolean isLogging;
 
-    private static final Logger logger = LoggerFactory.getLogger(ServerSocketWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger(SerialServerWorker.class);
 
-    public ServerSocketWorker(Socket socket, server.Story story, boolean isLogging) throws IOException {
+    public SerialServerWorker(Socket socket, server.Story story, boolean isLogging) throws IOException {
         this.socketToClient = socket;
         this.story = story;
         this.isLogging = isLogging;

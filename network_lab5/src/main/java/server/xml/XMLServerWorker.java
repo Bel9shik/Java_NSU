@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ServerSocketWorker extends server.ServerSocketWorker implements Runnable {
+public class XMLServerWorker extends server.ServerSocketWorker implements Runnable {
     private final Socket socketToClient;
     private final InputStream in;
     private final OutputStream out;
@@ -34,9 +34,9 @@ public class ServerSocketWorker extends server.ServerSocketWorker implements Run
     private final boolean isLogging;
     private final DocumentBuilder documentBuilder;
 
-    private static final Logger logger = LoggerFactory.getLogger(ServerSocketWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger(XMLServerWorker.class);
 
-    public ServerSocketWorker(Socket socket, Story story, boolean isLogging) throws IOException, ParserConfigurationException {
+    public XMLServerWorker(Socket socket, Story story, boolean isLogging) throws IOException, ParserConfigurationException {
         this.socketToClient = socket;
         this.story = story;
         this.isLogging = isLogging;
@@ -45,6 +45,7 @@ public class ServerSocketWorker extends server.ServerSocketWorker implements Run
         in = socket.getInputStream();
         curThread = new Thread(this);
         curThread.start();
+
     }
 
     public String getNickname() {

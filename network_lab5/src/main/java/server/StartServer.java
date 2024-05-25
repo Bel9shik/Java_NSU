@@ -2,6 +2,8 @@ package server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.serial.SerialServerWorker;
+import server.xml.XMLServerWorker;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -38,10 +40,10 @@ public class StartServer {
                 inputStream.read(bytes);
                 if (Byte.parseByte(String.valueOf(bytes[0])) == 0) { //xml
                     System.out.println("xml SocketWorker");
-                    clientsList.add(new server.xml.ServerSocketWorker(socket, story, parseConfigFile.getLogStatus()));
+                    clientsList.add(new XMLServerWorker(socket, story, parseConfigFile.getLogStatus()));
                 } else if (Byte.parseByte(String.valueOf(bytes[0])) == 1) { //serial
                     System.out.println("serial SocketWorker");
-                    clientsList.add(new server.serial.ServerSocketWorker(socket, story, parseConfigFile.getLogStatus()));
+                    clientsList.add(new SerialServerWorker(socket, story, parseConfigFile.getLogStatus()));
                 } else {
                     System.out.println("Unknown command");
                 }

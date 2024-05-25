@@ -6,7 +6,9 @@ import client.events.clientEvents.DownService;
 import client.events.clientEvents.UpdateChat;
 import client.events.messages.Message;
 import client.events.messages.TextMessage;
+import client.serial.SerialWorker;
 import client.view.ControllerView;
+import client.xml.XMLWorker;
 
 import java.io.IOException;
 
@@ -16,9 +18,9 @@ public class ClientController implements Observer {
 
     public ClientController(String host, int port, int type) {
         if (type == 0) {
-            socketWorker = new client.xml.SocketWorker(host, port);
+            socketWorker = new XMLWorker(host, port);
         } else if (type == 1) {
-            socketWorker = new client.serial.SocketWorker(host, port);
+            socketWorker = new SerialWorker(host, port);
         }
         controllerView = new ControllerView();
         socketWorker.addObserver(this);

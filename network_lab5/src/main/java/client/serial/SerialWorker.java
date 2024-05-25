@@ -1,5 +1,6 @@
 package client.serial;
 
+import client.SocketWorker;
 import client.events.clientEvents.ConnectionLost;
 import client.events.clientEvents.UpdateChat;
 import client.events.messages.Command;
@@ -11,7 +12,7 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class SocketWorker extends client.SocketWorker {
+public class SerialWorker extends SocketWorker {
     private Socket socketToServer;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -19,7 +20,7 @@ public class SocketWorker extends client.SocketWorker {
     private BufferedReader inputUser; // поток чтения с консоли
     private String nickname; // имя клиента
 
-    public SocketWorker(String host, int port) {
+    public SerialWorker(String host, int port) {
         try {
             inputUser = new BufferedReader(new InputStreamReader(System.in));
             pressNickname();
@@ -28,7 +29,7 @@ public class SocketWorker extends client.SocketWorker {
         } catch (IOException e) {
             System.out.println(e);
             e.printStackTrace();
-            SocketWorker.this.downService();
+            SerialWorker.this.downService();
         }
     }
 
@@ -90,7 +91,7 @@ public class SocketWorker extends client.SocketWorker {
                     }
                 }
             } catch (IOException | InterruptedException e) {
-                SocketWorker.this.downService();
+                SerialWorker.this.downService();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 System.out.println(e);
