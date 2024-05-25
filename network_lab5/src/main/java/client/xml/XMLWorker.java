@@ -1,10 +1,11 @@
 package client.xml;
 
+import client.Serializator;
 import client.SocketWorker;
 import client.events.clientEvents.ConnectionLost;
 import client.events.clientEvents.UpdateChat;
-import client.events.messages.Command;
 import client.events.messages.Message;
+import client.events.messages.Command;
 import client.events.messages.TextMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -26,66 +27,120 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
-public class XMLWorker extends SocketWorker {
+public class XMLWorker extends SocketWorker implements Serializator {
     private Socket socketToServer;
     private InputStream in;
     private OutputStream out;
-
-    private BufferedReader inputUser; // поток чтения с консоли
-    private String nickname; // имя клиента
+    private BufferedReader inputUser;
+    private String nickname;
     private DocumentBuilder documentBuilder;
-    private long UNIQUE_SESSION_ID;
+    private long UNIQUE_SESSION_ID = -1;
 
     public XMLWorker(String host, int port) {
         try {
             documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             inputUser = new BufferedReader(new InputStreamReader(System.in));
             pressNickname();
-            tryToConnect(host, port);
+            connect(host, port);
             if (UNIQUE_SESSION_ID == -1) {
                 inputUser.close();
                 downService();
             }
             new Thread(new ReadMsg()).start();
         } catch (IOException | ParserConfigurationException | SAXException e) {
-            System.out.println(e);
             e.printStackTrace();
             XMLWorker.this.downService();
         }
     }
 
+    @Override
+    public void sendMessage(Message message) {
+        try {
+            Document doc;
+            if (message instanceof Command) {
+                String command = ((Command) message).getCommand();
+                if (command.equals("/exit")) {
+                    doc = createCommandDocument("logout", "");
+                    send(doc);
+                    downService();
+                    notifyObservers(new ConnectionLost());
+                } else if (command.equals("/list")) {
+                    doc = createCommandDocument("list", "");
+                    send(doc);
+                }
+            } else if (message instanceof TextMessage) {
+                doc = createCommandDocument("message", message.toString());
+                send(doc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Message receiveMessage() throws IOException, SAXException {
+        Document document = readMessage();
+        if (document != null) {
+            return new TextMessage(document.getElementsByTagName("message").item(0).getTextContent());
+        }
+        return null;
+    }
+
+    private void requestHistory() throws IOException {
+        Document doc = createCommandDocument("history", "");
+        send(doc);
+    }
+
+    // В методе connect после успешного подключения добавить вызов requestHistory
+    @Override
+    public void connect(String host, int port) throws IOException, SAXException {
+        socketToServer = new Socket(host, port);
+        this.out = socketToServer.getOutputStream();
+        this.in = socketToServer.getInputStream();
+        out.write(0);
+
+        send(createLoginDocument());
+        Document doc = readMessage();
+        if (doc != null && doc.getDocumentElement().getNodeName().equals("success")) {
+            UNIQUE_SESSION_ID = Long.parseLong(doc.getElementsByTagName("session").item(0).getTextContent());
+            requestHistory();
+        } else {
+            UNIQUE_SESSION_ID = -1;
+        }
+    }
+
+    @Override
+    public void disconnect() throws IOException {
+        if (socketToServer != null && !socketToServer.isClosed()) {
+            socketToServer.close();
+        }
+        if (out != null) out.close();
+        if (in != null) in.close();
+    }
+
     private Document createCommandDocument(String type, String message) {
         Document doc = documentBuilder.newDocument();
         Element command = doc.createElement("command");
+        command.setAttribute("name", type);
 
         if (type.equals("login")) {
-            command.setAttribute("name", "login");
             Element name = doc.createElement("name");
             name.setTextContent(nickname);
             Element typeElement = doc.createElement("type");
             typeElement.setTextContent("CHAT_CLIENT_NAME");
             command.appendChild(name);
             command.appendChild(typeElement);
-        } else if (type.equals("list")) {
-            command.setAttribute("name", "list");
+        } else if (type.equals("list") || type.equals("logout")) {
             Element session = doc.createElement("session");
             session.setTextContent(String.valueOf(UNIQUE_SESSION_ID));
             command.appendChild(session);
         } else if (type.equals("message")) {
-            command.setAttribute("name", "message");
             Element messageElement = doc.createElement("message");
-            Date time = new Date(); // текущая дата
-            SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
-            String dtime = dt1.format(time); // время
+            String dtime = new SimpleDateFormat("HH:mm:ss").format(new Date());
             messageElement.setTextContent("[" + dtime + "] " + nickname + ": " + message);
             Element session = doc.createElement("session");
             session.setTextContent(String.valueOf(UNIQUE_SESSION_ID));
             command.appendChild(messageElement);
-            command.appendChild(session);
-        } else if (type.equals("logout")) {
-            command.setAttribute("name", "logout");
-            Element session = doc.createElement("session");
-            session.setTextContent(String.valueOf(UNIQUE_SESSION_ID));
             command.appendChild(session);
         }
 
@@ -93,33 +148,53 @@ public class XMLWorker extends SocketWorker {
         return doc;
     }
 
-    @Override
-    public void sendMessage(Message message) { // связка между клиентом и сервером
-
+    private Optional<String> convertDocumentToString(Document document) {
         try {
-            Document doc;
-            if (message instanceof Command) {
-                if (((Command) message).getCommand().equals("/exit")) {
-                    doc = createCommandDocument("logout", "");
-                    send(doc);
-                    downService(); // харакири
-                    notifyObservers(new ConnectionLost());
-                } else if (((Command) message).getCommand().equals("/list")) {
-                    doc = createCommandDocument("list", "");
-                    send(doc);
-                }
-            } else if (message instanceof TextMessage) {
-                doc = createCommandDocument("message", message.toString());
-                send(doc); // отправляем на сервер
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(writer));
+            return Optional.of(writer.getBuffer().toString());
+        } catch (Exception e) {
+            return Optional.empty();
         }
+    }
+
+    private void send(Document document) throws IOException {
+        Optional<String> messageString = convertDocumentToString(document);
+        if (messageString.isPresent()) {
+            byte[] messageBytes = messageString.get().getBytes(StandardCharsets.UTF_8);
+            out.write(ByteBuffer.allocate(4).putInt(messageBytes.length).array());
+            out.write(messageBytes);
+        }
+    }
+
+    private Document createLoginDocument() {
+        Document doc = documentBuilder.newDocument();
+        Element command = doc.createElement("command");
+        command.setAttribute("name", "userLogin");
+        Element name = doc.createElement("name");
+        name.setTextContent(nickname);
+        Element type = doc.createElement("type");
+        type.setTextContent("CHAT_CLIENT_NAME");
+        command.appendChild(name);
+        command.appendChild(type);
+        doc.appendChild(command);
+        return doc;
+    }
+
+    private Document readMessage() throws IOException, SAXException {
+        byte[] lengthBytes = new byte[4];
+        in.read(lengthBytes);
+        int messageLength = ByteBuffer.wrap(lengthBytes).getInt();
+        byte[] messageBytes = new byte[messageLength];
+        in.read(messageBytes);
+        String message = new String(messageBytes, StandardCharsets.UTF_8);
+        return documentBuilder.parse(new ByteArrayInputStream(message.getBytes()));
     }
 
     private void toDoFromDocument(Document document) {
         NodeList nodes;
-
         if ((nodes = document.getElementsByTagName("event")).getLength() > 0) {
             if (nodes.getLength() == 1) {
                 String command = nodes.item(0).getAttributes().getNamedItem("name").getNodeValue();
@@ -146,97 +221,26 @@ public class XMLWorker extends SocketWorker {
                         list.append(username).append("\n");
                     }
                     notifyObservers(new UpdateChat(list.toString()));
-                } //else типа другая команда
+                }
             }
         }
     }
 
-    // Метод для конвертации XML-документа в строку
-    private Optional<String> convertDocumentToString(Document document) {
-        try {
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            StringWriter writer = new StringWriter();
-            transformer.transform(new DOMSource(document), new StreamResult(writer));
-            return Optional.of(writer.getBuffer().toString());
-        } catch (Exception e) {
-            return Optional.empty();
-        }
-    }
-
-    public void send(Document message) throws IOException {
-        Optional<String> sendMessage = convertDocumentToString(message);
-        if (sendMessage.isPresent()) {
-            byte[] messageBytes = sendMessage.get().getBytes(StandardCharsets.UTF_8);
-            out.write(ByteBuffer.allocate(4).putInt(messageBytes.length).array());
-            out.write(messageBytes);
-        }
-    }
-
-    private Document createLoginDocument() {
-        Document nicknameDocument = documentBuilder.newDocument();
-        Element nicknameElement = nicknameDocument.createElement("command");
-        nicknameElement.setAttribute("name", "userLogin");
-        Element name = nicknameDocument.createElement("name");
-        name.setTextContent(nickname);
-        Element chatClientName = nicknameDocument.createElement("type");
-        chatClientName.setTextContent("CHAT_CLIENT_NAME");
-
-        nicknameElement.appendChild(name);
-        nicknameElement.appendChild(chatClientName);
-
-        nicknameDocument.appendChild(nicknameElement);
-
-        return nicknameDocument;
-    }
-
-    private void tryToConnect(String host, int port) throws IOException, SAXException {
-        socketToServer = new Socket(host, port);
-        this.out = socketToServer.getOutputStream();
-        this.in = socketToServer.getInputStream();
-        out.write(0);
-
-        send(createLoginDocument());
-        Document doc = readMessage();
-        if (doc.getDocumentElement().getNodeName().equals("success")) {
-            UNIQUE_SESSION_ID = Long.parseLong(doc.getElementsByTagName("success").item(0).getTextContent());
-        } else {
-            UNIQUE_SESSION_ID = -1;
-        }
-
-    }
-
     private void pressNickname() throws IOException {
-        System.out.print("Press your nick: ");
+        System.out.print("Enter your nickname: ");
         nickname = inputUser.readLine();
     }
 
-    private Document readMessage() throws IOException, SAXException {
-        byte[] lengthBytes = new byte[4];
-        in.read(lengthBytes);
-        int messageLength = ByteBuffer.wrap(lengthBytes).getInt();
-        byte[] messageBytes = new byte[messageLength];
-        in.read(messageBytes);
-        String message = new String(messageBytes, StandardCharsets.UTF_8);
-
-        return documentBuilder.parse(new ByteArrayInputStream(message.getBytes()));
-    }
-
-    // нить чтения сообщений с сервера
     private class ReadMsg implements Runnable {
         @Override
         public void run() {
-
-            Document responseDoc;
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    responseDoc = readMessage();
+                    Document responseDoc = readMessage();
                     toDoFromDocument(responseDoc);
                 }
-            } catch (IOException e) {
+            } catch (IOException | SAXException e) {
                 XMLWorker.this.downService();
-            } catch (SAXException e) {
-                throw new RuntimeException(e);//logger and xml error doc
             }
         }
     }
@@ -244,14 +248,9 @@ public class XMLWorker extends SocketWorker {
     @Override
     public void downService() {
         try {
-            if (!socketToServer.isClosed()) {
-                socketToServer.close();
-            }
-            out.close();
-            in.close();
+            disconnect();
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println(e);
         }
     }
 }

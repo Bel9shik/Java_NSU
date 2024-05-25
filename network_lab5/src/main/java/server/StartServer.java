@@ -21,7 +21,7 @@ public class StartServer {
 
     public static AtomicInteger uniqueSessionID = new AtomicInteger(0);
 
-    private static Logger logger = LoggerFactory.getLogger(StartServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(StartServer.class);
 
     public static void main(String[] args) {
         startServer();
@@ -38,18 +38,17 @@ public class StartServer {
                 InputStream inputStream = socket.getInputStream();
                 byte[] bytes = new byte[1];
                 inputStream.read(bytes);
-                if (Byte.parseByte(String.valueOf(bytes[0])) == 0) { //xml
-                    System.out.println("xml SocketWorker");
+                if (bytes[0] == 0) { // XML
                     clientsList.add(new XMLServerWorker(socket, story, parseConfigFile.getLogStatus()));
-                } else if (Byte.parseByte(String.valueOf(bytes[0])) == 1) { //serial
-                    System.out.println("serial SocketWorker");
+                } else if (bytes[0] == 1) { // Serialized
                     clientsList.add(new SerialServerWorker(socket, story, parseConfigFile.getLogStatus()));
                 } else {
                     System.out.println("Unknown command");
+                    socket.close();
                 }
             }
         } catch (IOException | ParserConfigurationException e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
         } finally {
             System.out.println("Server stopped.");
         }

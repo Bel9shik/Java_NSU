@@ -32,7 +32,6 @@ public class SerialServerWorker extends server.ServerSocketWorker implements Run
         in = new ObjectInputStream(socket.getInputStream());
         curThread = new Thread(this);
         curThread.start();
-        showStory();
     }
 
     private void showStory() {
@@ -129,7 +128,6 @@ public class SerialServerWorker extends server.ServerSocketWorker implements Run
             socketToClient.close();
             StartServer.clientsList.remove(this);
             curThread.interrupt();
-            System.out.println("Socket closed");
         } catch (IOException ignored) {
         }
     }

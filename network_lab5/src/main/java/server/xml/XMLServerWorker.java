@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import server.ServerSocketWorker;
 import server.StartServer;
 import server.Story;
 
@@ -21,6 +22,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -164,39 +166,50 @@ public class XMLServerWorker extends server.ServerSocketWorker implements Runnab
 
     private Document readMessage() throws IOException, SAXException {
         byte[] lengthBytes = new byte[4];
-        in.read(lengthBytes);
+        int bytesRead = in.read(lengthBytes);
+        if (bytesRead == -1) {
+            throw new IOException("Stream closed unexpectedly");
+        }
         int messageLength = ByteBuffer.wrap(lengthBytes).getInt();
         byte[] messageBytes = new byte[messageLength];
-        in.read(messageBytes);
+        bytesRead = in.read(messageBytes);
+        if (bytesRead == -1) {
+            throw new IOException("Stream closed unexpectedly");
+        }
         String message = new String(messageBytes, StandardCharsets.UTF_8);
+
+        if (message.isEmpty()) {
+            throw new SAXException("Received an empty XML message");
+        }
 
         return documentBuilder.parse(new ByteArrayInputStream(message.getBytes()));
     }
+
 
     private Document createResponseDocument(Document input) {
         Document response = documentBuilder.newDocument();
         NodeList nodes;
         if ((nodes = input.getElementsByTagName("command")).getLength() > 0) {
             if (nodes.getLength() == 1) {
-                String command = nodes.item(0).getAttributes().getNamedItem("name").getNodeValue();
-                switch (command) {
-                    case "login":
-                        response = createEventDocument("userLogin", nodes.item(0).getFirstChild().getTextContent(), nickname);
-                        break;
-                    case "list":
-                        response = createSuccessDocument("list");
-                        break;
-                    case "logout":
-                        response = createEventDocument("userLogout", nodes.item(0).getFirstChild().getTextContent(), nickname);
-                        break;
-                    case "message":
-                        response = createEventDocument("message", nodes.item(0).getFirstChild().getTextContent(), nickname);
-                        break;
+                Node commandNode = nodes.item(0);
+                if (commandNode != null && commandNode.getAttributes() != null) {
+                    String command = commandNode.getAttributes().getNamedItem("name").getNodeValue();
+                    response = switch (command) {
+                        case "login" ->
+                                createEventDocument("userLogin", commandNode.getFirstChild().getTextContent(), nickname);
+                        case "list" -> createSuccessDocument("list");
+                        case "logout" ->
+                                createEventDocument("userLogout", commandNode.getFirstChild().getTextContent(), nickname);
+                        case "message" ->
+                                createEventDocument("message", commandNode.getFirstChild().getTextContent(), nickname);
+                        default -> response;
+                    };
                 }
             }
         }
         return response;
     }
+
 
     private Document createResponseDocument(String typeMessage, String message) {
         documentBuilder.newDocument();
@@ -210,84 +223,86 @@ public class XMLServerWorker extends server.ServerSocketWorker implements Runnab
         return response;
     }
 
+    private void showStory() {
+        LinkedList<String> history = story.getStory();
+        if (history == null) return;
+        for (int i = 0; i < history.size(); i++) {
+            this.send(history.get(i));
+        }
+    }
+
 
     @Override
     public void run() {
+        if (clientConnected()) {
+            Document response = createSuccessDocument("login");
+            this.sendDocument(response);
+            if (isLogging) {
+                logger.info("{} logged in", nickname);
+            }
 
-        try {
-            if (clientConnected()) {
-                Document response = createSuccessDocument("login");
-                this.sendDocument(response);
-                if (isLogging) {
-                    logger.info("{} logged in", nickname);
-                }
+            showStory();
 
-                if (story.getStory() != null) {
-                    for (String document : story.getStory()) {
-                        this.send(document);
-                    }
-                }
-                for (server.ServerSocketWorker serverSocketWorker : StartServer.clientsList) {
+            synchronized (StartServer.clientsList) {
+                for (ServerSocketWorker serverSocketWorker : StartServer.clientsList) {
                     serverSocketWorker.send(nickname + " connected");
                 }
-            } else {
-                Document response = createErrorDocument("Incorrect data");
-                this.sendDocument(response);
-                this.downService();
             }
-
-            while (true) {
-
-                synchronized (this) {
-                    wait(100);
-                }
-
-                try {
-                    Document reqDocument = readMessage();
-
-                    Document response = createResponseDocument(reqDocument);
-
-                    Node tmpNode = response.getElementsByTagName("success").item(0);
-
-                    if (isLogging) {
-                        logger.info(response.getFirstChild().getTextContent());
-                    }
-
-                    if (tmpNode != null && tmpNode.getAttributes().getLength() == 0) {
-                        this.sendDocument(response);
-                        continue;
-                    }
-
-                    tmpNode = reqDocument.getElementsByTagName("command").item(0);
-                    if (tmpNode != null && tmpNode.getAttributes().getLength() != 0 && tmpNode.getAttributes().getNamedItem("name").getNodeValue().equals("logout")) {
-                        synchronized (StartServer.clientsList) {
-                            StartServer.clientsList.remove(this);
-                            for (server.ServerSocketWorker serverSocketWorker : StartServer.clientsList) {
-                                serverSocketWorker.send(response.getElementsByTagName("name").item(0).getTextContent() + " disconnected");
-                            }
-                        }
-                        this.downService();
-                        return;
-                    }
-
-                    story.addStory(response.getElementsByTagName("message").item(0).getTextContent());
-                    synchronized (StartServer.clientsList) {
-                        for (server.ServerSocketWorker serverSocketWorker : StartServer.clientsList) {
-                            serverSocketWorker.send(response.getElementsByTagName("message").item(0).getTextContent());
-                        }
-                    }
-
-                } catch (SAXException ignored) {}
-
-            }
-
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            System.out.println(e);
+        } else {
+            Document response = createErrorDocument("Incorrect data");
+            this.sendDocument(response);
             this.downService();
         }
+
+        while (true) {
+            try {
+                Document reqDocument = readMessage();
+                Document response = createResponseDocument(reqDocument);
+
+                if (response == null) {
+                    logger.error("Response document is null");
+                    continue;
+                }
+
+                Node tmpNode = response.getElementsByTagName("success").item(0);
+
+                if (tmpNode != null && tmpNode.getAttributes().getLength() == 0) {
+                    this.sendDocument(response);
+                    continue;
+                }
+
+                tmpNode = reqDocument.getElementsByTagName("command").item(0);
+                if (tmpNode != null && tmpNode.getAttributes() != null
+                        && "logout".equals(tmpNode.getAttributes().getNamedItem("name").getNodeValue())) {
+                    synchronized (StartServer.clientsList) {
+                        StartServer.clientsList.remove(this);
+                        for (ServerSocketWorker serverSocketWorker : StartServer.clientsList) {
+                            serverSocketWorker.send(response.getElementsByTagName("name").item(0).getTextContent() + " disconnected");
+                        }
+                    }
+                    this.downService();
+                    return;
+                }
+
+                Node messageNode = response.getElementsByTagName("message").item(0);
+                if (messageNode != null) {
+                    story.addStory(messageNode.getTextContent());
+                    synchronized (StartServer.clientsList) {
+                        for (ServerSocketWorker serverSocketWorker : StartServer.clientsList) {
+                            serverSocketWorker.send(messageNode.getTextContent());
+                        }
+                    }
+                } else {
+                    logger.error("Message node is null in response document");
+                }
+
+            } catch (SAXException | IOException e) {
+                logger.error("Error reading message: ", e);
+            }
+        }
     }
+
+
 
     private synchronized void sendDocument(Document message) {
         if (message == null) return;
